@@ -1,4 +1,4 @@
-import type { Post } from "@/types/types";
+import type { Post } from "@/types/system";
 import { PostCard } from "../Cards/PostCard";
 import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { NavLink } from "react-router-dom";

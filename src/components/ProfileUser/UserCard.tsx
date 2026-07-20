@@ -1,5 +1,5 @@
-import type { User } from "@/types/types";
-import type { Option } from "@/types/types";
+import type { User } from "@/types/system";
+import type { Option } from "@/types/system";
 import { useLocation } from "react-router-dom";
 import { MoreOptions } from "../Post/MoreOptions";
 

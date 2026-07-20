@@ -23,7 +23,7 @@ export const AsidePost = () => {
           <div className="flex items-center gap-3">
             <Buttonav
               path="/publicar/texto"
-              className="w-32 flex flex-col gap-2 items-center justify-center p-3 rounded-2xl bg-surface hover:bg-surface-2 border border-[var(--color-border)] transition"
+              className="w-32 flex flex-col gap-2 items-center justify-center p-3 rounded-2xl bg-surface hover:bg-surface-1 border border-[var(--color-border)]"
               aria-label="Publicar texto"
             >
               <Pencil size={20} className="text-primary" />
@@ -32,7 +32,7 @@ export const AsidePost = () => {
 
             <Buttonav
               path="/publicar/documento"
-              className="w-32 flex flex-col gap-2 items-center justify-center p-3 rounded-2xl bg-surface hover:bg-surface-2 border border-[var(--color-border)] transition"
+              className="w-32 flex flex-col gap-2 items-center justify-center p-3 rounded-2xl bg-surface hover:bg-surface-1 border border-[var(--color-border)]"
               aria-label="Publicar imagen"
             >
               <File size={20} className="text-primary" />

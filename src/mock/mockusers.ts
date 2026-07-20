@@ -1,4 +1,4 @@
-import type { User } from "@/types/types";
+import type { User } from "@/types/users";
 import avatarimage from "../assets/images/048617ceb68b40a45847078db347ba59.png";
 
 export const userlist: User[] = [

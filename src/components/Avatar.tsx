@@ -1,7 +1,7 @@
 import avatardefault from "@/assets/images/20260215_015334.jpg";
 
 //TYPES
-import type { User } from "@/types/types";
+import type { User } from "@/types/users";
 
 export const Avatar = ({ user, size = 10 }: { user: User; size?: number }) => {
   const { name, avatar } = user;

@@ -7,6 +7,7 @@ import { CommentCard } from "../Cards/CommentCard";
 import { exampleComments } from "@/mock/mockcomments";
 import { Avatar } from "../Avatar";
 import { useAuthContext } from "@/context/AuthContext";
+import image from "@/assets/images/20260328_032700.jpg"
 
 const post = {
   id: 100,
@@ -40,7 +41,7 @@ const post = {
     name: "Equipo Editorial",
     email: "editorial@journal.example",
     password: "••••••",
-    avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+    avatar: image,
   },
 };
 

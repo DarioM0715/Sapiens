@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronRight, Settings, Trash2 } from "lucide-react";
-import type { Notification } from "@/types/types";
+import type { Notification } from "@/types/system";
 import { formatearFechaShort } from "@/shared/utils/utilsfunctions";
 import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { AsidePost } from "../AsidePost";

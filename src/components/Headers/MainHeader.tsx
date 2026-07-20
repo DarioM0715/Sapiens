@@ -14,6 +14,8 @@ import { Input } from "@/shared/inputs/Input";
 
 export const MainHeader = () => {
   const { user } = useAuthContext();
+  const { id } = user
+
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const rightActionsRef = useRef<HTMLDivElement | null>(null);
 
@@ -52,7 +54,7 @@ export const MainHeader = () => {
   const buttonsNotifications = [{ name: "Notificaciones", path: "/notificaciones" }];
 
   const buttonsProfile = [
-    { name: "Ver perfil", path: "/perfil" },
+    { name: "Ver perfil", path:`/perfil/${id}` },
     { name: "Ajustes", path: "/ajustes" },
     { name: "Cerrar sesión", path: "/login" },
   ];

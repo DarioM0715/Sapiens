@@ -1,12 +1,12 @@
 import { timeAgo } from "@/shared/utils/utilsfunctions";
 import { MoreOptions } from "../Post/MoreOptions";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Stats } from "../Post/Stats";
 import { Avatar } from "../Avatar";
 
 //INTERFACES
-import type { Post } from "@/types/types";
-import type { Option } from "@/types/types";
+import type { Post } from "@/types/post";
+import type { Option } from "@/types/system";
 
 // ICONS
 import { Bookmark, Share2, User } from "lucide-react";
@@ -49,7 +49,6 @@ export const PostCard = ({ post }: { post: Post }) => {
     <article id={String(id)} className={containerClasses} aria-labelledby={`post-title-${id}`}>
       {/* HEADER */}
       <div className="flex text-primary justify-between items-center">
-        <NavLink to="/otroperfil/:4">
           <div className="flex items-center gap-3">
             <Avatar user={user} size={12} />
 
@@ -71,7 +70,6 @@ export const PostCard = ({ post }: { post: Post }) => {
               </div>
             </div>
           </div>
-        </NavLink>
 
         <MoreOptions options={options} onSelect={handleSelect} />
       </div>
@@ -88,7 +86,7 @@ export const PostCard = ({ post }: { post: Post }) => {
         <div className="flex items-center gap-2">{(categories?.length ?? 0) > 0 && categories!.map((category) => <CategoryBubble key={category} category={category} />)}</div>
       </div>
 
-      <Stats stats={post} />
+      <Stats post={post} />
     </article>
   );
 };

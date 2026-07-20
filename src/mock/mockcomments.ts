@@ -1,9 +1,10 @@
-import type { Comment } from "@/types/types";
+import type { Comment } from "@/types/post";
+import image from "@/assets/images/20260328_032700.jpg"
 
 export const exampleComments: Comment[] = [
   {
     id: 1,
-    user: { id: 101, name: "María López", username: "maria.l", avatar: "/avatars/maria.jpg" },
+    user: { id: 101, name: "María López", username: "maria.l", avatar: image },
     content: "Gran artículo — muy útil la sección de recursos al final.",
     time: "2025-12-27T18:12:00.000Z",
     likes: 24,
@@ -42,7 +43,7 @@ export const exampleComments: Comment[] = [
   },
   {
     id: 5,
-    user: { id: 105, name: "Lucía Gómez", username: "lucia.g", avatar: "/avatars/lucia.png" },
+    user: { id: 105, name: "Lucía Gómez", username: "lucia.g", avatar: image },
     content: "Pequeño hilo con más detalles — lo copio abajo.",
 
     time: "2025-12-24T14:00:00.000Z",

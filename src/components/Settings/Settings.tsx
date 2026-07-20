@@ -117,15 +117,15 @@ const Settings = () => {
               return (
                 <button
                   key={name}
-                  className={`w-full p-5 flex items-center text-primary transition justify-start ${active ? "bg-surface/50" : "hover:bg-surface"}`}
+                  className={`w-full p-5 flex items-center text-primary transition justify-start cursor-pointer ${active ? "bg-surface/50" : "hover:bg-surface"}`}
                   onClick={(e: React.MouseEvent) => {
                     e.preventDefault();
                     setSelectedNav(name);
                   }}
                   aria-pressed={active}
                 >
-                  <div className="flex gap-5 items-center">
-                    <Icon size={20} className="text-primary" />
+                  <div className={`flex gap-5 items-center ${active ? "text-gray-500" : "text-primary"}`}>
+                    <Icon size={20} />
                     <span className="text-lg font-medium truncate">{name}</span>
                   </div>
                 </button>

@@ -3,8 +3,8 @@ import { MoreOptions } from "../Post/MoreOptions";
 import { NavLink, useNavigate } from "react-router-dom";
 
 //INTERFACES
-import type { Comment } from "@/types/types";
-import type { Option } from "@/types/types";
+import type { Comment } from "@/types/system";
+import type { Option } from "@/types/system";
 
 // ICONS
 import { Bookmark, Share2, Trash } from "lucide-react";

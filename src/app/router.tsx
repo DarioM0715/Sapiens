@@ -33,7 +33,7 @@ const Profile = lazy(() => import("@/components/ProfileUser/PageProfile"));
 const EditProfile = lazy(() => import("@/components/ProfileUser/EditProfile"));
 const FollowersList = lazy(() => import("@/components/ProfileUser/FollowersList"));
 const FollowingList = lazy(() => import("@/components/ProfileUser/FollowingList"));
-const OtherProfile = lazy(() => import("@/components/ProfileUser/OtherProfile"));
+// const OtherProfile = lazy(() => import("@/components/ProfileUser/OtherProfile"));
 
 //CHAT
 // const Chat = lazy(() => import("@/components/Chat/Chat"));
@@ -79,13 +79,12 @@ export const router = createBrowserRouter([
       { path: "/ajustes/cuenta/restablecer-contraseña", element: <ResetPassword /> },
 
       //PROFILE
-      { path: "/perfil", element: <Profile /> },
+      { path: "/perfil/:id", element: <Profile /> },
       { path: "/perfil/:categoria", element: <Profile /> },
       { path: "/perfil/editar", element: <EditProfile /> },
       { path: "/perfil/siguiendo", element: <FollowingList /> },
       { path: "/perfil/seguidores", element: <FollowersList /> },
-
-      { path: "/otroperfil/:id", element: <OtherProfile /> },
+      // { path: "/otroperfil/:id", element: <OtherProfile /> },
 
       //CHAT
       // { path: "/chat", element: <Chat /> },

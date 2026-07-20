@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { Option } from "@/types/types";
+import type { Option } from "@/types/system";
 import { MoreVertical } from "lucide-react";
 import ReactDOM from "react-dom";
 import { ButtonAction } from "@/shared/ui/ButtonAction";
