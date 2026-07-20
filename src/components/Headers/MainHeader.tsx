@@ -54,7 +54,7 @@ export const MainHeader = () => {
   const buttonsNotifications = [{ name: "Notificaciones", path: "/notificaciones" }];
 
   const buttonsProfile = [
-    { name: "Ver perfil", path:`/perfil/${id}` },
+    { name: "Ver perfil", path:`/user/${id}` },
     { name: "Ajustes", path: "/ajustes" },
     { name: "Cerrar sesión", path: "/login" },
   ];
@@ -90,7 +90,7 @@ export const MainHeader = () => {
           <div className="flex items-center gap-4" ref={rightActionsRef}>
             {/* Crear documento */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("post")}>
-              <button aria-label="Crear documento" aria-haspopup="true" type="button" className="p-2 rounded-md cursor-pointer hover:bg-surface-2 transition">
+              <button aria-label="Crear documento" aria-haspopup="true" type="button" className="p-2 rounded-md cursor-pointer hover-surface-2 transition">
                 <PencilLine size={20} className="text-primary" />
               </button>
               {openPanel === "post" && <PanelOptions title="Escritura" buttons={buttonsPost} />}
@@ -98,18 +98,18 @@ export const MainHeader = () => {
 
             {/* Notificaciones */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("notifications")}>
-              <button aria-label="Notificaciones" aria-haspopup="true" type="button" className="p-2 rounded-md cursor-pointer hover:bg-surface-2 transition">
+              <button aria-label="Notificaciones" aria-haspopup="true" type="button" className="p-2 rounded-md cursor-pointer hover-surface-2 transition">
                 <Bell size={20} className="text-primary" />
               </button>
               {openPanel === "notifications" && <PanelOptions title="Notificaciones" buttons={buttonsNotifications} />}
             </div>
 
-            {/* Perfil */}
+            {/* user */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("profile")}>
-              <NavLink to="/perfil" className="block rounded-full focus:outline-none focus-ring-primary" aria-haspopup="true">
+              <NavLink to="/user" className="block rounded-full focus:outline-none focus-ring-primary" aria-haspopup="true">
                 <Avatar user={user} size={10} />
               </NavLink>
-              {openPanel === "profile" && <PanelOptions title="Perfil" buttons={buttonsProfile} />}
+              {openPanel === "profile" && <PanelOptions title="user" buttons={buttonsProfile} />}
             </div>
           </div>
         </div>

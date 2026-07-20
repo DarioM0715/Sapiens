@@ -43,7 +43,7 @@ export const PostCard = ({ post }: { post: Post }) => {
   };
 
   const containerClasses =
-    pathname === "/detalles/:id" ? "flex flex-col py-6 px-4 gap-3 border-default rounded-lg bg-surface" : "flex flex-col py-6 px-4 gap-3 border-b border-gray-200";
+    pathname === "/post/:id" ? "flex flex-col py-6 px-4 gap-3 border-default rounded-lg bg-surface" : "flex flex-col py-6 px-4 gap-3 border-b border-gray-200";
 
   return (
     <article id={String(id)} className={containerClasses} aria-labelledby={`post-title-${id}`}>
@@ -75,7 +75,7 @@ export const PostCard = ({ post }: { post: Post }) => {
       </div>
 
       {/* BODY (clicable) */}
-      <div onClick={() => handleNavigate(`/detalles/${id}`)} role="button" className="flex flex-col gap-2 text-primary cursor-pointer">
+      <div onClick={() => handleNavigate(`/post/${id}`)} role="button" className="flex flex-col gap-2 text-primary cursor-pointer">
         <h3 className="font-bold text-lg flex items-center gap-2" id={`post-title-click-${id}`}>
           {title}
         </h3>

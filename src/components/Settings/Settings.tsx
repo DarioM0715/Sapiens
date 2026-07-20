@@ -26,8 +26,8 @@ const Settings = () => {
   const privacidadsettings = [
     { name: "Mostrar las publicaciones que he publicado en mi página personal" },
     { name: "Mostrar los comentarios que he publicado en mi página personal" },
-    { name: "Mostrar la lista de usuarios que sigo en mi perfil" },
-    { name: "Mostrar los usuarios que me siguen en mi perfil" },
+    { name: "Mostrar la lista de usuarios que sigo en mi user" },
+    { name: "Mostrar los usuarios que me siguen en mi user" },
     { name: "Se pueden hacer comentarios en mis publicaciones y comentarios" },
     { name: "Pueden compartirse mis publicaciones" },
     { name: "Pueden guardarse mis publicaciones" },

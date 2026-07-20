@@ -85,7 +85,7 @@ const CreateArticle = ({ document }: { document: boolean }) => {
               <ButtonAction
                 onClick={cancel}
                 type="button"
-                className="px-4 py-2 rounded-md border border-[var(--color-border)] bg-surface text-primary hover:bg-surface-2 transition"
+                className="px-4 py-2 rounded-md border border-[var(--color-border)] bg-surface text-primary hover-surface-2 transition"
               >
                 Cancelar
               </ButtonAction>

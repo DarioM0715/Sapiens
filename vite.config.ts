@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: { host: true, port: 5173 },
+  server: { host: true, port: 5174 },
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),

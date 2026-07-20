@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
 
 const Navs = ({ path, title, number }: { path: string; title: string; number: number }) => {
   return (
-    <Buttonav path={path} className="p-3 py-2 flex items-center gap-2 bg-surface-2 border-default rounded-xl hover:bg-surface-2">
+    <Buttonav path={path} className="p-3 py-2 flex items-center gap-2 bg-surface-2 border-default rounded-xl hover-surface-2">
       <span className="text-sm text-primary">{title}</span>
       <span className="text-sm font-bold text-primary">{number}</span>
     </Buttonav>
@@ -29,16 +29,16 @@ export const Profile = ({ user, type }: { user: User; type: boolean }) => {
 
   const profilenavs = [
     { path: "/", title: "Publicaciones", number: 1 },
-    { path: "/perfil/siguiendo", title: "Siguiendo", number: 20 },
-    { path: "/perfil/seguidores", title: "Seguidores", number: 20 },
-    { path: "/perfil/me-gusta", title: "Me gusta", number: 10 },
+    { path: "/user/siguiendo", title: "Siguiendo", number: 20 },
+    { path: "/user/seguidores", title: "Seguidores", number: 20 },
+    { path: "/user/me-gusta", title: "Me gusta", number: 10 },
   ];
 
   const infonavs = [
-    { name: "Publicaciones", path: "/perfil/publicaciones" },
-    { name: "Comentarios", path: "/perfil/comentarios" },
-    { name: "Guardados", path: "/perfil/guardados" },
-    { name: "Me gusta", path: "/perfil/me-gusta" },
+    { name: "Publicaciones", path: "/user/publicaciones" },
+    { name: "Comentarios", path: "/user/comentarios" },
+    { name: "Guardados", path: "/user/guardados" },
+    { name: "Me gusta", path: "/user/me-gusta" },
   ];
 
   const handleMouseEnter = (panel: string) => {
@@ -63,8 +63,8 @@ export const Profile = ({ user, type }: { user: User; type: boolean }) => {
   }, []);
 
   const buttonsoptions = [
-    { name: "Denunciar usuario", path: "/perfil/321", icon: Flag },
-    { name: "Bloquear usuario", path: "/perfil/321", icon: UserLock },
+    { name: "Denunciar usuario", path: "/user/321", icon: Flag },
+    { name: "Bloquear usuario", path: "/user/321", icon: UserLock },
   ];
 
   return (
@@ -95,7 +95,7 @@ export const Profile = ({ user, type }: { user: User; type: boolean }) => {
 
               <div className="flex gap-2 " ref={rightActionsRef}>
                 {type ? (
-                  <Buttonav path="/perfil/editar" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-2 border-default transition">
+                  <Buttonav path="/user/editar" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-2 border-default transition">
                     <Edit size={18} className="text-primary" />
                     <span className="text-sm font-medium text-primary">Editar</span>
                   </Buttonav>
@@ -109,7 +109,7 @@ export const Profile = ({ user, type }: { user: User; type: boolean }) => {
                     </div>
 
                     <div className="inline-block" onMouseEnter={() => handleMouseEnter("follow")}>
-                      <Buttonav path="/perfil/editar" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-2 border-default transition">
+                      <Buttonav path="/user/editar" className="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-2 border-default transition">
                         <span className="text-sm font-medium ">Seguir</span>
                       </Buttonav>
                     </div>

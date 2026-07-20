@@ -1,12 +1,12 @@
 // INTERFACES
-import type { Post, Comment } from "@/types/post";
+import type { Post } from "@/types/post";
 
 // ICONS
 import { Eye, MessageCircle, ThumbsUp, ThumbsDown, type LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
-  post: Post | Comment;
+  post: Post;
 };
 
 type InteractButtonProps = {
@@ -39,7 +39,7 @@ export const Stats = ({ post }: Props) => {
     <div className="flex justify-between items-center pt-2">
       <div className="flex items-center gap-6 text-muted">
         <InteractButton Icon={Eye} value={views} />
-        <InteractButton Icon={MessageCircle} value={messages} onClick={() => handleNavigate(`/detalles/${id}`)}/>
+        <InteractButton Icon={MessageCircle} value={messages} onClick={() => handleNavigate(`/post/${id}`)}/>
       </div>
 
       <div className="flex items-center gap-4 text-muted">

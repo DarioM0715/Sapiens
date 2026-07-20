@@ -23,7 +23,7 @@ const EditProfile: React.FC = () => {
               {/* Visual file input (no handler) */}
               <label
                 htmlFor="avatar-upload"
-                className="absolute right-0 bottom-0 transform translate-x-2 translate-y-2 bg-white border border-[var(--color-border)] rounded-full p-2 shadow-sm cursor-pointer hover:bg-surface-2"
+                className="absolute right-0 bottom-0 transform translate-x-2 translate-y-2 bg-white border border-[var(--color-border)] rounded-full p-2 shadow-sm cursor-pointer hover-surface-2"
                 title="Cambiar avatar"
               >
                 <Camera size={18} className="text-primary" />
@@ -108,7 +108,7 @@ const EditProfile: React.FC = () => {
                 <button
                   type="button"
                   aria-label="Cancelar"
-                  className="px-4 py-2 rounded-lg border border-[var(--color-border)] text-primary bg-surface hover:bg-surface-2"
+                  className="px-4 py-2 rounded-lg border border-[var(--color-border)] text-primary bg-surface hover-surface-2"
                 >
                   Cancelar
                 </button>

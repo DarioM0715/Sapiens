@@ -3,8 +3,6 @@ import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { Download } from "lucide-react";
 import { Paperclip, Smile, Send } from "lucide-react";
 import { PostCard } from "../Cards/PostCard";
-import { CommentCard } from "../Cards/CommentCard";
-import { exampleComments } from "@/mock/mockcomments";
 import { Avatar } from "../Avatar";
 import { useAuthContext } from "@/context/AuthContext";
 import image from "@/assets/images/20260328_032700.jpg"
@@ -120,9 +118,7 @@ const Commentbox: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-4">
-              {exampleComments.map((comment) => (
-                <CommentCard comment={comment} />
-              ))}
+              <PostCard post={post} />
             </div>
           </div>
         </div>
@@ -174,7 +170,7 @@ const Commentbox: React.FC = () => {
 
             <div className="mt-3">
               <a
-                href={post.documentUrl}
+                href={documentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-center px-4 py-2 rounded-md transition border-default text-primary bg-surface hover:bg-surface-2"

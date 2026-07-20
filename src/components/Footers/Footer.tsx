@@ -7,7 +7,7 @@ export const Footer = () => {
     { name: "Buscar", path: "/buscar", Icon: Satellite },
     { name: "Publicar", path: "/publicar", Icon: CirclePlus },
     { name: "Notificaciones", path: "/notificaciones", Icon: Bell },
-    { name: "Perfil", path: "/perfil", Icon: User },
+    { name: "user", path: "/user", Icon: User },
   ];
 
   return (

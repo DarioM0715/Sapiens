@@ -8,7 +8,7 @@
   --color-accent: #f59e0b;
 
   --color-surface: #ffffff;
-  --color-surface-2: #f8fafc;
+  --color-surface-2: #f8fafced;
 
   --color-border: #e6e7ea;
 
@@ -37,6 +37,9 @@
 }
 .bg-surface-2 {
   @apply bg-[var(--color-surface-2)];
+}
+.hover-surface-2 {
+  @apply hover:bg-[var(--color-surface-2)];
 }
 
 /* TEXT COLORS */

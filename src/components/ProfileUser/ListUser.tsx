@@ -23,11 +23,11 @@ export const ListUser = ({ listuser }: { listuser: User[] }) => {
     { id: 6, label: "Reportar", Icon: Flag },
   ];
 
-  if (pathname !== "/perfil/siguiendo") {
+  if (pathname !== "/user/siguiendo") {
     options.splice(1, 1);
   }
 
-  if (pathname !== "/perfil/seguidores") {
+  if (pathname !== "/user/seguidores") {
     options.splice(2, 1);
   }
 

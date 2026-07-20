@@ -16,7 +16,7 @@ const EventCard: React.FC<{ event: Notification }> = ({ event }) => {
           <p className="text-sm text-muted mt-1">{description}</p>
         </div>
 
-        <button type="button" aria-label={`Eliminar evento ${title}`} className="p-2 rounded-md hover:bg-surface-2 transition flex items-center justify-center">
+        <button type="button" aria-label={`Eliminar evento ${title}`} className="p-2 rounded-md hover-surface-2 transition flex items-center justify-center">
           <Trash2 size={18} className="text-muted" />
         </button>
       </div>
@@ -27,7 +27,7 @@ const EventCard: React.FC<{ event: Notification }> = ({ event }) => {
         <button
           type="button"
           className="inline-flex items-center gap-2 text-sm text-primary hover:text-[var(--color-primary-600)] transition"
-          aria-label={`Ver detalles de ${title}`}
+          aria-label={`Ver post de ${title}`}
         >
           <span>Haz clic para continuar</span>
           <ChevronRight size={18} />

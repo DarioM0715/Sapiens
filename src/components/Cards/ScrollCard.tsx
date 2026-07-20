@@ -1,9 +1,9 @@
-import type { Post } from "@/types/system";
 import { PostCard } from "../Cards/PostCard";
 import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { NavLink } from "react-router-dom";
 import { AsidePost } from "../AsidePost";
 import type { Path } from "@/types/components";
+import type { Post } from "@/types/post";
 
 interface Props {
   posts: Post[];

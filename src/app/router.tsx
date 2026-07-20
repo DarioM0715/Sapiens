@@ -62,7 +62,7 @@ export const router = createBrowserRouter([
       { path: "/publicar/documento", element: <CreateArticle document={true} /> },
 
       //ARTICLE INFO
-      { path: "/detalles/:id", element: <Commentbox /> },
+      { path: "/post/:id", element: <Commentbox /> },
 
       //NOTIFICATIONS
       { path: "/notificaciones", element: <Notifications /> },
@@ -79,12 +79,12 @@ export const router = createBrowserRouter([
       { path: "/ajustes/cuenta/restablecer-contraseña", element: <ResetPassword /> },
 
       //PROFILE
-      { path: "/perfil/:id", element: <Profile /> },
-      { path: "/perfil/:categoria", element: <Profile /> },
-      { path: "/perfil/editar", element: <EditProfile /> },
-      { path: "/perfil/siguiendo", element: <FollowingList /> },
-      { path: "/perfil/seguidores", element: <FollowersList /> },
-      // { path: "/otroperfil/:id", element: <OtherProfile /> },
+      { path: "/user/:id", element: <Profile /> },
+      { path: "/user/:categoria", element: <Profile /> },
+      { path: "/user/editar", element: <EditProfile /> },
+      { path: "/user/siguiendo", element: <FollowingList /> },
+      { path: "/user/seguidores", element: <FollowersList /> },
+      // { path: "/user/:id", element: <OtherProfile /> },
 
       //CHAT
       // { path: "/chat", element: <Chat /> },

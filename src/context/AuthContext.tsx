@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: any) => {
     password: "123456",
     avatar: profileimage,
     background: backgroundimage,
-    note: "Este es mi perfil",
+    note: "Este es mi user",
     theme: "light",
   });
 
