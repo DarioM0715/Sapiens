@@ -6,6 +6,7 @@ import Layout from "@/components/Layout";
 
 // MAIN
 const Home = lazy(() => import("@/components/Home/Home"));
+const Community = lazy(() => import("@/components/Community/Community"));
 
 // POST
 const CreateArticle = lazy(() => import("@/components/Post/CreateArticle"));
@@ -48,41 +49,41 @@ const NotFound = lazy(() => import("@/shared/NotFound"));
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/inicio" replace />,
+    element: <Navigate to="/home" replace />,
   },
 
   {
     element: <Layout />,
     children: [
       //HOME
-      { path: "/:categoria", element: <Home /> },
+      { path: "/home", element: <Home /> },
+      { path: "/community", element: <Community/>},
 
       //CREATE ARTICLE
-      { path: "/publicar/texto", element: <CreateArticle document={false} /> },
-      { path: "/publicar/documento", element: <CreateArticle document={true} /> },
+      { path: "/create/article", element: <CreateArticle document={false} /> },
+      { path: "/create/document", element: <CreateArticle document={true} /> },
 
       //ARTICLE INFO
       { path: "/post/:id", element: <Commentbox /> },
 
       //NOTIFICATIONS
-      { path: "/notificaciones", element: <Notifications /> },
-      { path: "/notificaciones/publicaciones", element: <NotificationsArticles /> },
-      // { path: "/notificaciones/eventos", element: <NotificationsEvents /> },
-      { path: "/notificaciones/comentarios", element: <NotificationsArticles /> },
+      { path: "/notifications", element: <Notifications /> },
+      { path: "/notifications/post", element: <NotificationsArticles /> },
+      // { path: "/notifications/eventos", element: <NotificationsEvents /> },
 
       //SETTINGS
-      { path: "/ajustes", element: <Settings /> },
-      { path: "/ajustes/sistema", element: <SettingsSystem /> },
-      { path: "/ajustes/cuenta", element: <SettingsAccount /> },
-      { path: "/ajustes/cuenta/contraseña", element: <ChangePassword /> },
-      { path: "/ajustes/cuenta/olvide-contraseña", element: <ForgotPassword /> },
-      { path: "/ajustes/cuenta/restablecer-contraseña", element: <ResetPassword /> },
+      { path: "/settings", element: <Settings /> },
+      { path: "/settings/sistema", element: <SettingsSystem /> },
+      { path: "/settings/cuenta", element: <SettingsAccount /> },
+      { path: "/settings/cuenta/contraseña", element: <ChangePassword /> },
+      { path: "/settings/cuenta/olvide-contraseña", element: <ForgotPassword /> },
+      { path: "/settings/cuenta/restablecer-contraseña", element: <ResetPassword /> },
 
       //PROFILE
       { path: "/user/:id", element: <Profile /> },
       { path: "/user/:categoria", element: <Profile /> },
       { path: "/user/editar", element: <EditProfile /> },
-      { path: "/user/siguiendo", element: <FollowingList /> },
+      { path: "/user/following", element: <FollowingList /> },
       { path: "/user/seguidores", element: <FollowersList /> },
       // { path: "/user/:id", element: <OtherProfile /> },
 

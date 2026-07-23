@@ -10,8 +10,8 @@ type SettingsNav = {
 const Settings = () => {
   const settingsnavs: SettingsNav[] = [
     { name: "Notificaciones", path: "/notificaciones", icon: Bell },
-    { name: "Privacidad", path: "/ajustes/privacidad", icon: LockIcon },
-    { name: "Sistema", path: "/ajustes/sistema", icon: LockIcon },
+    { name: "Privacidad", path: "/settings/privacidad", icon: LockIcon },
+    { name: "Sistema", path: "/settings/sistema", icon: LockIcon },
   ];
 
   const notificacionessettings = [
@@ -36,7 +36,7 @@ const Settings = () => {
 
   const sistemasettings = [{ name: "Ajustes de apariencia" }];
 
-  const [selectedNav, setSelectedNav] = useState<string>("Informacion");
+  const [selectedNav, setSelectedNav] = useState<string>("Notificaciones");
 
   const initialNotificationsState = useMemo(() => {
     const state: Record<string, boolean> = {};
@@ -57,7 +57,7 @@ const Settings = () => {
           <div className="p-4">
             <div className="space-y-5">
               {notificacionessettings.map((n) => (
-                <div key={n.name} className="flex items-center justify-between rounded-md">
+                <div key={n.name} className="flex items-center justify-between rounded-md text-primary">
                   <div>{n.name}</div>
 
                   <label className="flex items-center gap-2">
@@ -80,7 +80,7 @@ const Settings = () => {
           <div className="p-4">
             <div className="space-y-5">
               {privacidadsettings.map((p) => (
-                <div key={p.name} className="flex items-center justify-between rounded-md ">
+                <div key={p.name} className="flex items-center justify-between rounded-md text-primary">
                   <div className="truncate">{p.name}</div>
                   <input type="checkbox" className="h-4 w-4 " defaultChecked />
                 </div>
@@ -94,7 +94,7 @@ const Settings = () => {
           <div className="p-4">
             <ul className="space-y-5">
               {sistemasettings.map((s) => (
-                <li key={s.name} className="rounded-md">
+                <li key={s.name} className="rounded-md text-primary">
                   {s.name}
                 </li>
               ))}
@@ -108,7 +108,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="flex justify-center gap-8 w-full py-5 px-5 lg:px-10 xl:px-20">
+    <div className="bg-surface flex justify-center gap-8 w-full h-screen py-5 px-5 lg:px-10 xl:px-20">
       <div className="w-80">
         <div className="bg-surface-2 border-default rounded-2xl shadow-sm">
           <nav className="flex flex-col divide-y divide-[var(--color-border)] rounded-md">

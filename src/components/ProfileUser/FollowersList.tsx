@@ -6,7 +6,7 @@ const FollowersList = () => {
   const navs = [
     {
       name: "Seguidores",
-      path: "/user/siguiendo",
+      path: "/user/following",
     },
   ];
 

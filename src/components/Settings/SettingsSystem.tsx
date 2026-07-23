@@ -8,7 +8,7 @@ const SettingsSystem = () => {
   const handleClose = () => setOpen(false);
   const handleOpen = () => setOpen(true);
 
-  const listlink = [{ title: "Ajustes de apariencia" }];
+  const listlink = [{ title: "settings de apariencia" }];
 
   return (
     <div className=" bg-primary text-primary">

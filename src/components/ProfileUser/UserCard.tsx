@@ -24,7 +24,7 @@ export const UserCard = ({ user }: { user: User }) => {
     { id: 6, label: "Reportar", Icon: Flag },
   ];
 
-  if (pathname !== "/user/siguiendo") {
+  if (pathname !== "/user/following") {
     options.splice(1, 1);
   }
 
@@ -38,7 +38,7 @@ export const UserCard = ({ user }: { user: User }) => {
         <Avatar user={user} size={12} />
 
         <div className="flex flex-col leading-tight">
-          <h3 className="font-bold text-textprimary">{name}</h3>
+          <h3 className="font-bold text-primary">{name}</h3>
           {username && <p className="text-sm text-gray-500">@{username}</p>}
           <div className="flex items-center gap-2 text-xs text-gray-400">
             {role && (

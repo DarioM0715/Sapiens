@@ -2,8 +2,8 @@ import { NavLink } from "react-router-dom";
 
 export const MobileHeader = () => {
   const navsup = [
-    { name: "Siguiendo", path: "/siguiendo" },
-    { name: "Inicio", path: "/inicio" },
+    { name: "Siguiendo", path: "/following" },
+    { name: "Inicio", path: "/home" },
     { name: "Eventos", path: "/eventos" },
   ];
 

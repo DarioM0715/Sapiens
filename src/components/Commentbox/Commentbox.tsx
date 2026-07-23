@@ -52,7 +52,7 @@ const Commentbox: React.FC = () => {
     <div className={`bg-surface text-primary min-h-[60vh] py-8 ${isDesktop ? "px-10" : "px-4"}`} aria-label="Documento y comentarios">
       <div className={isDesktop ? "max-w-[1200px] mx-0 grid grid-cols-[1fr_320px] gap-8 items-start" : "max-w-3xl mx-auto"}>
         <div>
-          <PostCard post={post} />
+          <PostCard post={post} className="border rounded-md border-[var(--color-border)]" />
 
           <div className="mt-4 p-4 bg-surface-2 rounded-md border-default">
             <h2 className="text-2xl font-bold mb-3 text-primary">Contenido:</h2>
@@ -91,7 +91,7 @@ const Commentbox: React.FC = () => {
                     id="comment-input"
                     placeholder="Escribe tu comentario..."
                     rows={3}
-                    className="w-full input-underline resize-none bg-transparent text-primary placeholder:text-muted focus-ring-primary"
+                    className="w-full input-underline bg-transparent text-primary placeholder:text-muted"
                     aria-label="Escribe tu comentario"
                   />
 
@@ -118,7 +118,7 @@ const Commentbox: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-4">
-              <PostCard post={post} />
+              <PostCard post={post} className="border rounded-md border-[var(--color-border)]" />
             </div>
           </div>
         </div>

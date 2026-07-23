@@ -3,7 +3,7 @@ import { Home, Satellite, CirclePlus, User, Bell } from "lucide-react";
 
 export const Footer = () => {
   const navsbottom = [
-    { name: "Inicio", path: "/inicio", Icon: Home },
+    { name: "Inicio", path: "/home", Icon: Home },
     { name: "Buscar", path: "/buscar", Icon: Satellite },
     { name: "Publicar", path: "/publicar", Icon: CirclePlus },
     { name: "Notificaciones", path: "/notificaciones", Icon: Bell },

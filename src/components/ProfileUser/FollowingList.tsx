@@ -3,7 +3,7 @@ import { UserCard } from "./UserCard";
 import { NavLink } from "react-router-dom";
 
 const FollowingList = () => {
-  const navs = [{ name: "Siguiendo", path: "/user/siguiendo" }];
+  const navs = [{ name: "Siguiendo", path: "/user/following" }];
 
   return (
     <div className="flex flex-col justify-center lg:flex-row gap-8 w-full py-5 px-5 lg:px-20 xl:px-32">

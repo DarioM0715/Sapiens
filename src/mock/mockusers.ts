@@ -1,5 +1,5 @@
 import type { User } from "@/types/users";
-import avatarimage from "../assets/images/048617ceb68b40a45847078db347ba59.png";
+// import avatarimage from "../assets/images/048617ceb68b40a45847078db347ba59.png";
 
 export const userlist: User[] = [
   {
@@ -8,7 +8,7 @@ export const userlist: User[] = [
     username: "laurag",
     email: "laura.gomez@example.com",
     password: "hashed_password_1",
-    avatar: avatarimage,
+    // avatar: avatarimage,
     sex: "femenino",
     background: "#fce4ec",
     note: "Amante de la fotografía y los viajes.",
@@ -20,7 +20,7 @@ export const userlist: User[] = [
     username: "carlitos_mdz",
     email: "carlos.mendoza@example.com",
     password: "hashed_password_2",
-    avatar: avatarimage,
+    // avatar: avatarimage,
     sex: "masculino",
     background: "#e3f2fd",
     note: "Desarrollador web y entusiasta del café.",
@@ -32,7 +32,7 @@ export const userlist: User[] = [
     username: "anatorres_98",
     email: "ana.torres@example.com",
     password: "hashed_password_3",
-    avatar: avatarimage,
+    // avatar: avatarimage,
     sex: "femenino",
     background: "#fff8e1",
     note: "Diseñadora UX/UI. Amante del arte digital.",
@@ -44,7 +44,7 @@ export const userlist: User[] = [
     username: "julian_dev",
     email: "julian.herrera@example.com",
     password: "hashed_password_4",
-    avatar: avatarimage,
+    // avatar: avatarimage,
     sex: "masculino",
     background: "#ede7f6",
     note: "Frontend developer. Fan del anime y React.",
@@ -56,7 +56,7 @@ export const userlist: User[] = [
     username: "camiv",
     email: "camila.vargas@example.com",
     password: "hashed_password_5",
-    avatar: avatarimage,
+    // avatar: avatarimage,
     sex: "femenino",
     background: "#f3e5f5",
     note: "Me encanta la moda sostenible y la fotografía.",
@@ -68,7 +68,7 @@ export const userlist: User[] = [
     username: "davidsz",
     email: "david.salazar@example.com",
     password: "hashed_password_6",
-    avatar: avatarimage,
+    // avatar: avatarimage,
     sex: "masculino",
     background: "#e8f5e9",
     note: "Product manager apasionado por las startups.",
@@ -80,7 +80,7 @@ export const userlist: User[] = [
     username: "valeruiz",
     email: "valentina.ruiz@example.com",
     password: "hashed_password_7",
-    avatar: avatarimage,
+    // avatar: avatarimage,
     sex: "femenino",
     background: "#fff3e0",
     note: "Estudiante de marketing digital.",
@@ -92,7 +92,7 @@ export const userlist: User[] = [
     username: "andrespx",
     email: "andres.perez@example.com",
     password: "hashed_password_8",
-    avatar: avatarimage,
+    // avatar: avatarimage,
     sex: "masculino",
     background: "#e1f5fe",
     note: "Creador de contenido y viajero empedernido.",

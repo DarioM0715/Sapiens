@@ -15,7 +15,7 @@ export const ScrollCard = ({ posts, navs }: Props) => {
   const isDesktop = useIsDesktop(1024);
 
   return (
-    <div className="flex flex-col justify-center lg:flex-row gap-8 w-full py-5 px-5 lg:px-10 xl:px-20">
+    <div className="flex justify-center bg-surface lg:flex-row gap-8 w-full py-5 px-5 lg:px-10 xl:px-20">
       {/* MAIN COLUMN */}
       <section className="flex-1 flex flex-col rounded-2xl bg-surface-2 border-default">
         {isDesktop && (
@@ -39,9 +39,11 @@ export const ScrollCard = ({ posts, navs }: Props) => {
           </nav>
         )}
 
-        <div className="flex flex-col gap-4 bg-surface p-4 md:p-6 rounded-b-2xl overflow-hidden">
+        <div className="flex flex-col gap-4 bg-surface rounded-b-2xl overflow-hidden">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <div className="border-b border-[var(--color-border)]">
+              <PostCard key={post.id} post={post} />
+            </div>
           ))}
         </div>
       </section>

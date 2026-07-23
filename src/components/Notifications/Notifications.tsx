@@ -24,13 +24,13 @@ export const Notifications = () => {
                 Notificaciones
               </h2>
 
-              <Buttonav path="/ajustes/notificaciones" className="pr-2.5">
+              <Buttonav path="/settings/notificaciones" className="pr-2.5">
                 <Settings size={20} className="text-primary" />
               </Buttonav>
             </div>
           </div>
 
-          <nav className="flex flex-col divide-y divide-[var(--color-border)] rounded-md">
+          <nav className="flex flex-col divide-y divide-[var(--color-border)] rounded-md text-primary">
             {notificationsnavs.map(({ name, path, icon: Icon }) => (
               <Buttonav path={path} className="w-full p-5 flex items-center justify-between text-primary hover:bg-surface transition">
                 <div className="flex gap-5 items-center">
@@ -38,7 +38,7 @@ export const Notifications = () => {
                   <span className="text-lg font-medium truncate">{name}</span>
                 </div>
 
-                <span className="rounded-full bg-blue-500 w-8 h-8 flex items-center justify-center text-white font-bold">4</span>
+                <span className="rounded-full bg-blue-500 w-8 h-8 flex items-center justify-center font-bold">4</span>
               </Buttonav>
             ))}
           </nav>

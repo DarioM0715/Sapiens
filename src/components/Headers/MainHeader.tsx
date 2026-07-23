@@ -21,8 +21,8 @@ export const MainHeader = () => {
 
   const navsup = [
     { name: "Sapiens", path: "/" },
-    { name: "Inicio", path: "/inicio" },
-    { name: "Comunidades", path: "/comunidades" },
+    { name: "Inicio", path: "/home" },
+    { name: "Comunidades", path: "/community" },
   ];
 
   const handleMouseEnter = (panel: string) => {
@@ -47,15 +47,15 @@ export const MainHeader = () => {
   }, []);
 
   const buttonsPost = [
-    { name: "Mensaje", path: "/publicar/texto" },
-    { name: "Documento", path: "/publicar/documento" },
+    { name: "Texto", path: "/create/article" },
+    { name: "Documento", path: "/create/document" },
   ];
 
   const buttonsNotifications = [{ name: "Notificaciones", path: "/notificaciones" }];
 
   const buttonsProfile = [
     { name: "Ver perfil", path:`/user/${id}` },
-    { name: "Ajustes", path: "/ajustes" },
+    { name: "Ajustes", path: "/settings" },
     { name: "Cerrar sesión", path: "/login" },
   ];
 
@@ -109,7 +109,7 @@ export const MainHeader = () => {
               <NavLink to="/user" className="block rounded-full focus:outline-none focus-ring-primary" aria-haspopup="true">
                 <Avatar user={user} size={10} />
               </NavLink>
-              {openPanel === "profile" && <PanelOptions title="user" buttons={buttonsProfile} />}
+              {openPanel === "profile" && <PanelOptions title="Usuario" buttons={buttonsProfile} />}
             </div>
           </div>
         </div>

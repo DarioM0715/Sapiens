@@ -1,29 +1,16 @@
 import { Sun, Moon } from "lucide-react";
+import { useTheme } from "@/shared/theme/ThemeProvider";
 
 export const ToggleTheme = () => {
-  const handleToggleTheme = () => {
-    const isDark = document.documentElement.classList.contains("dark");
+  const { theme, toggleTheme } = useTheme();
 
-    if (isDark) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
-  };
-
-  return <button onClick={handleToggleTheme}>{document.documentElement.classList.contains("dark") ? <Sun size={24} /> : <Moon size={24} />}</button>;
-};
-
-export const handleToggleTheme = () => {
-  const isDark = document.documentElement.classList.contains("dark");
-
-  if (isDark) {
-    document.documentElement.classList.remove("dark");
-    localStorage.setItem("theme", "light");
-  } else {
-    document.documentElement.classList.add("dark");
-    localStorage.setItem("theme", "dark");
-  }
+  return (
+    <button
+      onClick={toggleTheme}
+      className="inline-flex items-center justify-center rounded-full p-2 transition-colors duration-200 hover:bg-surface-2 dark:hover:bg-surface"
+      aria-label="Cambiar tema"
+    >
+      {theme === "dark" ? <Sun size={24} /> : <Moon size={24} />}
+    </button>
+  );
 };

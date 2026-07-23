@@ -3,9 +3,8 @@ import { examplePosts } from "@/mock/mockpublic";
 
 const Home = () => {
   const navs = [
-    { name: "Siguiendo", path: "/siguiendo" },
-    { name: "Inicio", path: "/inicio" },
-    { name: "Eventos", path: "/eventos" },
+    { name: "Inicio", path: "/home" },
+    { name: "Siguiendo", path: "/following" },
   ];
 
   return <ScrollCard posts={examplePosts} navs={navs} />;

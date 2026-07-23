@@ -15,14 +15,14 @@ export const AsidePost = () => {
 
   return (
     <aside className="w-80 sticky -top-200 md:w-80 flex-shrink-0 px-2" aria-label="Barra lateral de publicaciones">
-      <div className="max-h-[calc(100vh-5rem)]  flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
         {/* PUBLICAR */}
         <div className="p-4 border-default rounded-xl flex flex-col gap-4 bg-surface-2 shadow-sm">
           <h2 className="text-lg font-semibold text-primary">Haz una publicación</h2>
 
           <div className="flex items-center gap-3">
             <Buttonav
-              path="/publicar/texto"
+              path="/create/article"
               className="w-32 flex flex-col gap-2 items-center justify-center p-3 rounded-2xl bg-surface hover-surface-2 border border-[var(--color-border)]"
               aria-label="Publicar texto"
             >
@@ -31,7 +31,7 @@ export const AsidePost = () => {
             </Buttonav>
 
             <Buttonav
-              path="/publicar/documento"
+              path="/create/document"
               className="w-32 flex flex-col gap-2 items-center justify-center p-3 rounded-2xl bg-surface hover-surface-2 border border-[var(--color-border)]"
               aria-label="Publicar imagen"
             >
@@ -94,13 +94,8 @@ export const AsidePost = () => {
 
           <div className="flex flex-col gap-2 text-sm text-primary">
             <div>
-              <p className="font-medium">Nombre del contacto</p>
-              <p className="text-muted">email@ejemplo.com</p>
-            </div>
-
-            <div>
               <p className="font-medium">Soporte</p>
-              <p className="text-muted">soporte@ejemplo.com</p>
+              <p className="text-muted">dariomartinezotano@gmail.com</p>
             </div>
           </div>
 

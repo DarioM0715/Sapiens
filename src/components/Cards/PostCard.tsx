@@ -1,6 +1,6 @@
 import { timeAgo } from "@/shared/utils/utilsfunctions";
 import { MoreOptions } from "../Post/MoreOptions";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Stats } from "../Post/Stats";
 import { Avatar } from "../Avatar";
 
@@ -20,9 +20,8 @@ const CategoryBubble = ({ category }: { category: string }) => {
   );
 };
 
-export const PostCard = ({ post }: { post: Post }) => {
+export const PostCard = ({ post, className }: { post: Post, className?: string }) => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -32,21 +31,21 @@ export const PostCard = ({ post }: { post: Post }) => {
   const { name } = user;
 
   const options: Option[] = [
-    { id: 1, label: "Guardar", Icon: Bookmark },
-    { id: 2, label: "Compartir", Icon: Share2 },
-    { id: 3, label: "Ver perfil", Icon: User },
-    // { id: 3, label: "Eliminar publicación", Icon: Trash },
+    { id: 1, label: "Denunciar"},
+    { id: 2, label: "Bloquear usuario"},
+    { id: 3, label: "Copiar enlace"},
+    { id: 4, label: "Dejar de seguir"},
+    { id: 5, label: "Guardar", Icon: Bookmark },
+    { id: 6, label: "Compartir", Icon: Share2 },
+    { id: 7, label: "Ver perfil", Icon: User },
   ];
 
   const handleSelect = (option: Option) => {
     console.log(option);
   };
 
-  const containerClasses =
-    pathname === "/post/:id" ? "flex flex-col py-6 px-4 gap-3 border-default rounded-lg bg-surface" : "flex flex-col py-6 px-4 gap-3 border-b border-gray-200";
-
   return (
-    <article id={String(id)} className={containerClasses} aria-labelledby={`post-title-${id}`}>
+    <article id={String(id)} className={`flex flex-col gap-3 p-4 md:p-6 ${className}`} aria-labelledby={`post-title-${id}`}>
       {/* HEADER */}
       <div className="flex text-primary justify-between items-center">
           <div className="flex items-center gap-3">

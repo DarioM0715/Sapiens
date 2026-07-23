@@ -10,18 +10,6 @@ export type Options = {
   function: any;
 };
 
-export type Comment = {
-  id: number;
-  user: User;
-  content: string;
-  media?: Media[];
-  time: string;
-  likes: number;
-  dislikes?: number;
-  views: number;
-  messages: number;
-};
-
 export type Like = {
   id: number;
   user: User;
@@ -46,7 +34,6 @@ export type Post = {
   likes: number;
   dislikes?: number;
   media?: Media[];
-  comments?: Comment[];
   user: User;
   institution?: string;
   type?: string;

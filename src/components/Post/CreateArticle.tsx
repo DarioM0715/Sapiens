@@ -15,15 +15,15 @@ const CreateArticle = ({ document }: { document: boolean }) => {
   };
 
   return (
-    <div className="flex items-center justify-center px-5 lg:px-10 xl:px-20 w-full">
+    <div className="flex items-center justify-center px-5 lg:px-10 xl:px-20 w-full h-screen bg-surface">
       <div className="w-full my-5 mx-5 lg:mx-10 xl:mx-20 p-8 bg-surface rounded-2xl border-default shadow-md">
         <div className="flex flex-col gap-4">
-          <div className="border-b border-[var(--color-border)] pb-4 font-semibold">{document ? "Publicar documento" : "Publicar mensaje"}</div>
+          <div className="border-b border-[var(--color-border)] pb-4 font-semibold text-primary">{document ? "Publicar documento" : "Publicar mensaje"}</div>
 
           {/* Archive */}
           {document && (
             <>
-              <div className="font-semibold">Archivo</div>
+              <div className="font-semibold text-primary">Archivo</div>
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3 flex-wrap">
                   <label

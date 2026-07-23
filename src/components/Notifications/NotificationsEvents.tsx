@@ -81,7 +81,7 @@ const NotificationsEvents: React.FC = () => {
                   <p id="events-heading" className="font-bold text-lg text-primary">
                     Eventos
                   </p>
-                  <button aria-label="Ajustes de eventos" className="p-2 rounded-md hover:bg-surface transition">
+                  <button aria-label="settings de eventos" className="p-2 rounded-md hover:bg-surface transition">
                     <Settings size={18} className="text-primary" />
                   </button>
                 </div>

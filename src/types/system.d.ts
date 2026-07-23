@@ -3,7 +3,6 @@ export type Share = {
   id: number;
   user: User;
   post: Post;
-  comment: Comment;
   destination: string;
   time: string;
   url?: string;

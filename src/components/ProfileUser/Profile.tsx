@@ -29,7 +29,7 @@ export const Profile = ({ user, type }: { user: User; type: boolean }) => {
 
   const profilenavs = [
     { path: "/", title: "Publicaciones", number: 1 },
-    { path: "/user/siguiendo", title: "Siguiendo", number: 20 },
+    { path: "/user/following", title: "Siguiendo", number: 20 },
     { path: "/user/seguidores", title: "Seguidores", number: 20 },
     { path: "/user/me-gusta", title: "Me gusta", number: 10 },
   ];

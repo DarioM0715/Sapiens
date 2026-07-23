@@ -96,11 +96,11 @@ export function MoreOptions({ options, onSelect, initialOpen = false }: BottomSh
 
             {/* Title */}
             <div className="px-4 pb-2 bg-surface-2  border-b border-[var(--color-border)]">
-              <h3 className="text-sm font-medium text-primary dark:text-gray-100">Opciones</h3>
+              <h3 className="text-sm font-medium text-primary">Opciones</h3>
             </div>
 
             {/* Options list */}
-            <div className="divide-y divide-[var(--color-border)]">
+            <div className="divide-y divide-[var(--color-border)] text-primary">
               {options.map((opt, idx) => (
                 <button
                   key={opt.id}

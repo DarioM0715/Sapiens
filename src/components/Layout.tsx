@@ -8,11 +8,11 @@ const Layout = ({ sidebarBreakpoint = 1024 }) => {
   const isDesktop = useIsDesktop(sidebarBreakpoint);
 
   return (
-    <div className="bg-white text-textprimary">
+    <div className="bg-surface">
       <ScrollToTop />
       {isDesktop ? <MainHeader /> : <MobileHeader />}
 
-      <main className="flex items-center justify-center ">
+      <main className="flex items-center justify-center bg-surface">
         <Outlet />
       </main>
     </div>
@@ -20,5 +20,3 @@ const Layout = ({ sidebarBreakpoint = 1024 }) => {
 };
 
 export default Layout;
-
-// py-5 px-5 lg:px-10 xl:px-20
