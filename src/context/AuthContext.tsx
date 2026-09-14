@@ -8,6 +8,7 @@ interface AuthContextProps {
   singup: any;
   logout: any;
   verifyUser: any;
+  updateUser: any;
   isLoadingAuth: boolean;
 }
 
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextProps>({
   singup: () => {},
   logout: () => {},
   verifyUser: () => {},
+  updateUser: () => {},
   isLoadingAuth: true,
 });
 
@@ -69,12 +71,23 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
+  const updateUser = async (data: any) => {
+    try {
+      const response = await apiServer.put("/auth/users/me", data);
+      setUser(response.data.user);
+      return response.data.user;
+    } catch (error) {
+      console.error("Error al actualizar usuario", error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     verifyUser().finally(() => setIsLoadingAuth(false));
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, singup, logout, verifyUser, isLoadingAuth }}>
+    <AuthContext.Provider value={{ user, setUser, login, singup, logout, verifyUser, updateUser, isLoadingAuth }}>
       {children}
     </AuthContext.Provider>
   );

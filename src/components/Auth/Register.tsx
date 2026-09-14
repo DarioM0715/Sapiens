@@ -41,8 +41,9 @@ const Register = () => {
     try {
       await singup({ username: data.username, email: data.email, password: data.password });
       navigate("/home");
-    } catch (e: any) {
-      setError(e?.response?.data?.message || "Error al crear la cuenta");
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setError(err?.response?.data?.message || "Error al crear la cuenta");
     }
   };
 

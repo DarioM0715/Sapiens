@@ -35,8 +35,9 @@ const Login = () => {
     try {
       await login(data);
       navigate("/home");
-    } catch (e: any) {
-      setError(e?.response?.data?.message || "Error al iniciar sesión");
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      setError(err?.response?.data?.message || "Error al iniciar sesión");
     }
   };
 
