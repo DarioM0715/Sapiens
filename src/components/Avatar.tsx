@@ -1,10 +1,9 @@
-// import avatardefault from "@/assets/images/20260215_015334.jpg";
-
 //TYPES
 import type { User } from "@/types/users";
 
-export const Avatar = ({ user, size = 10 }: { user: User; size?: number }) => {
-  const { name, avatar } = user;
+export const Avatar = ({ user, size = 10 }: { user: User | null; size?: number }) => {
+  const name = user?.name ?? "";
+  const avatar = user?.avatar ?? "";
 
   return avatar ? (
     <img src={avatar} alt={name} className={`rounded-full object-cover w-${size} h-${size}`} />

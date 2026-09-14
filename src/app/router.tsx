@@ -3,6 +3,7 @@ import { lazy } from "react";
 
 //COMPONENTS
 import Layout from "@/components/Layout";
+import AuthGuard from "@/context/AuthGuard";
 
 // MAIN
 const Home = lazy(() => import("@/components/Home/Home"));
@@ -34,10 +35,8 @@ const Profile = lazy(() => import("@/components/ProfileUser/PageProfile"));
 const EditProfile = lazy(() => import("@/components/ProfileUser/EditProfile"));
 const FollowersList = lazy(() => import("@/components/ProfileUser/FollowersList"));
 const FollowingList = lazy(() => import("@/components/ProfileUser/FollowingList"));
-// const OtherProfile = lazy(() => import("@/components/ProfileUser/OtherProfile"));
 
 //CHAT
-// const Chat = lazy(() => import("@/components/Chat/Chat"));
 const CreateGroup = lazy(() => import("@/components/Chat/CreateGroup"));
 const GroupSettings = lazy(() => import("@/components/Chat/GroupSettings"));
 
@@ -55,48 +54,39 @@ export const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
-      //HOME
-      { path: "/home", element: <Home /> },
-      { path: "/community", element: <Community/>},
+      { element: <AuthGuard />, children: [
+        { path: "/home", element: <Home /> },
+        { path: "/community", element: <Community/>},
 
-      //CREATE ARTICLE
-      { path: "/create/article", element: <CreateArticle document={false} /> },
-      { path: "/create/document", element: <CreateArticle document={true} /> },
+        { path: "/create/article", element: <CreateArticle document={false} /> },
+        { path: "/create/document", element: <CreateArticle document={true} /> },
 
-      //ARTICLE INFO
-      { path: "/post/:id", element: <Commentbox /> },
+        { path: "/post/:id", element: <Commentbox /> },
 
-      //NOTIFICATIONS
-      { path: "/notifications", element: <Notifications /> },
-      { path: "/notifications/post", element: <NotificationsArticles /> },
-      // { path: "/notifications/eventos", element: <NotificationsEvents /> },
+        { path: "/notifications", element: <Notifications /> },
+        { path: "/notifications/post", element: <NotificationsArticles /> },
 
-      //SETTINGS
-      { path: "/settings", element: <Settings /> },
-      { path: "/settings/sistema", element: <SettingsSystem /> },
-      { path: "/settings/cuenta", element: <SettingsAccount /> },
-      { path: "/settings/cuenta/contraseña", element: <ChangePassword /> },
-      { path: "/settings/cuenta/olvide-contraseña", element: <ForgotPassword /> },
-      { path: "/settings/cuenta/restablecer-contraseña", element: <ResetPassword /> },
+        { path: "/settings", element: <Settings /> },
+        { path: "/settings/sistema", element: <SettingsSystem /> },
+        { path: "/settings/cuenta", element: <SettingsAccount /> },
+        { path: "/settings/cuenta/contraseña", element: <ChangePassword /> },
+        { path: "/settings/cuenta/olvide-contraseña", element: <ForgotPassword /> },
+        { path: "/settings/cuenta/restablecer-contraseña", element: <ResetPassword /> },
 
-      //PROFILE
-      { path: "/user/:id", element: <Profile /> },
-      { path: "/user/:categoria", element: <Profile /> },
-      { path: "/user/editar", element: <EditProfile /> },
-      { path: "/user/following", element: <FollowingList /> },
-      { path: "/user/seguidores", element: <FollowersList /> },
-      // { path: "/user/:id", element: <OtherProfile /> },
+        { path: "/user/:id", element: <Profile /> },
+        { path: "/user/:categoria", element: <Profile /> },
+        { path: "/user/editar", element: <EditProfile /> },
+        { path: "/user/following", element: <FollowingList /> },
+        { path: "/user/seguidores", element: <FollowersList /> },
 
-      //CHAT
-      // { path: "/chat", element: <Chat /> },
-      { path: "/chat/crear", element: <CreateGroup /> },
-      { path: "/chat/grupo/:id", element: <GroupSettings /> },
+        { path: "/chat/crear", element: <CreateGroup /> },
+        { path: "/chat/grupo/:id", element: <GroupSettings /> },
 
-      { path: "/invitar-usuario", element: <InviteUser /> },
+        { path: "/invitar-usuario", element: <InviteUser /> },
+      ]},
     ],
   },
 
-  //INDEX
   { path: "*", element: <NotFound /> },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },

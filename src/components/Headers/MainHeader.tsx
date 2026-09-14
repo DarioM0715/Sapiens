@@ -24,7 +24,7 @@ export const Bubble = ({ number }: { number: number }) => {
 
 export const MainHeader = () => {
   const { user } = useAuthContext();
-  const { id } = user
+  const id = user?.id ?? "";
 
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const rightActionsRef = useRef<HTMLDivElement | null>(null);
