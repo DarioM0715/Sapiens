@@ -1,4 +1,5 @@
 //REACT
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
@@ -21,6 +22,7 @@ import type { LOGIN_FORM } from "@/types/formstypes";
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuthContext();
+  const [error, setError] = useState("");
   const { register, handleSubmit } = useForm<LOGIN_FORM>({
     defaultValues: {
       username: "",
@@ -29,11 +31,12 @@ const Login = () => {
   });
 
   const onSubmit = async (data: LOGIN_FORM) => {
+    setError("");
     try {
-      await login(data)
-      navigate("/home")
-    } catch (e) {
-      console.log("Ha ocurrido un error")
+      await login(data);
+      navigate("/home");
+    } catch (e: any) {
+      setError(e?.response?.data?.message || "Error al iniciar sesión");
     }
   };
 
@@ -75,6 +78,8 @@ const Login = () => {
               <input {...register("password")} name="password" type="password" placeholder="Contraseña" autoComplete="current-password" className="input-underline" />
             </div>
           </section>
+
+          {error && <p className="w-full text-center text-sm text-red-500">{error}</p>}
 
           <div className="flex flex-col items-center text-md gap-3 w-full">
             <div className="w-full flex flex-col gap-3 text-sm sm:flex-row sm:justify-between">

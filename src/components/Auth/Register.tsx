@@ -1,5 +1,10 @@
 //REACT
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+
+//CONTEXT
+import { useAuthContext } from "@/context/AuthContext";
 
 //COMPONENTS
 import { ButtonAction } from "@/shared/ui/ButtonAction";
@@ -15,6 +20,9 @@ import { FaUserCircle } from "react-icons/fa";
 import type { REGISTER_FORM } from "@/types/formstypes";
 
 const Register = () => {
+  const navigate = useNavigate();
+  const { singup } = useAuthContext();
+  const [error, setError] = useState("");
   const { handleSubmit, register } = useForm<REGISTER_FORM>({
     defaultValues: {
       username: "",
@@ -24,8 +32,18 @@ const Register = () => {
     },
   });
 
-  const onSubmit = (data: REGISTER_FORM) => {
-    console.log("submit", data);
+  const onSubmit = async (data: REGISTER_FORM) => {
+    setError("");
+    if (data.password !== data.confirm_password) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+    try {
+      await singup({ username: data.username, email: data.email, password: data.password });
+      navigate("/home");
+    } catch (e: any) {
+      setError(e?.response?.data?.message || "Error al crear la cuenta");
+    }
   };
 
   return (
@@ -73,6 +91,8 @@ const Register = () => {
               />
             </div>
           </section>
+
+          {error && <p className="w-full text-center text-sm text-red-500">{error}</p>}
 
           <div className="flex w-full justify-between text-sm">
             <Buttonav path="/login" className="text-primary hover:underline hover:text-primary-600 visited:text-primary cursor-pointer">

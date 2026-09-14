@@ -1,7 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { apiServer } from "@/services/apiServer";
-import profileimage from "@/assets/images/048617ceb68b40a45847078db347ba59.png";
-import backgroundimage from "@/assets/images/image.png";
 
 interface AuthContextProps {
   user: any;
@@ -10,6 +8,7 @@ interface AuthContextProps {
   singup: any;
   logout: any;
   verifyUser: any;
+  isLoadingAuth: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -19,56 +18,64 @@ const AuthContext = createContext<AuthContextProps>({
   singup: () => {},
   logout: () => {},
   verifyUser: () => {},
+  isLoadingAuth: true,
 });
 
 export const useAuthContext = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState({
-    id: 1,
-    name: "Dario Martinez",
-    email: "dario@gmail.com",
-    password: "123456",
-    avatar: profileimage,
-    background: backgroundimage,
-    note: "Este es mi user",
-    theme: "light",
-  });
+  const [user, setUser] = useState(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   const login = async (data: any) => {
     try {
-      // const response = await apiServer.post("/auth/login", data);
-      setUser(data);
+      const response = await apiServer.post("/auth/login", data);
+      setUser(response.data.user);
+      return response.data.user;
     } catch (error) {
-      console.log("Error al login");
+      console.error("Error al login", error);
+      throw error;
     }
   };
 
   const singup = async (data: any) => {
     try {
-      // const response = await apiServer.post("/auth/signup", data);
-      setUser(data);
+      const response = await apiServer.post("/auth/signup", data);
+      setUser(response.data.user);
+      return response.data.user;
     } catch (error) {
-      console.log("Error al signup");
+      console.error("Error al signup", error);
+      throw error;
     }
   };
 
   const logout = async () => {
     try {
       await apiServer.post("/auth/logout");
-      // setUser(null);
+      setUser(null);
     } catch (error) {
-      console.log("Error al logout");
+      console.error("Error al logout", error);
     }
   };
 
   const verifyUser = async () => {
     try {
-      await apiServer.get("/auth/verify");
+      const response = await apiServer.get("/auth/verify");
+      setUser(response.data.user);
+      return response.data.user;
     } catch (error) {
-      console.log("Error al verificar usuario");
+      console.error("Error al verificar usuario", error);
+      setUser(null);
     }
   };
 
-  return <AuthContext.Provider value={{ user, setUser, login, singup, logout, verifyUser }}>{children}</AuthContext.Provider>;
+  useEffect(() => {
+    verifyUser().finally(() => setIsLoadingAuth(false));
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, setUser, login, singup, logout, verifyUser, isLoadingAuth }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
