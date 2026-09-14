@@ -1,7 +1,7 @@
 const Community = () => {
     return (
-        <div>
-            Hola a todos
+        <div className="flex justify-center bg-surface lg:flex-row gap-8 w-full py-5 px-5 lg:px-10 xl:px-20">
+            
         </div>
     )
 }

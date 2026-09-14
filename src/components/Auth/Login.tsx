@@ -1,5 +1,9 @@
 //REACT
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+
+//CONTEXT
+import { useAuthContext } from "@/context/AuthContext";
 
 //COMPONENTS
 import { Buttonav } from "@/shared/ui/Buttonnav";
@@ -15,16 +19,22 @@ import { BsGoogle } from "react-icons/bs";
 import type { LOGIN_FORM } from "@/types/formstypes";
 
 const Login = () => {
-  
+  const navigate = useNavigate();
+  const { login } = useAuthContext();
   const { register, handleSubmit } = useForm<LOGIN_FORM>({
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
 
-  const onSubmit = (data: LOGIN_FORM) => {
-    console.log("submit", data);
+  const onSubmit = async (data: LOGIN_FORM) => {
+    try {
+      await login(data)
+      navigate("/home")
+    } catch (e) {
+      console.log("Ha ocurrido un error")
+    }
   };
 
   return (
@@ -48,13 +58,13 @@ const Login = () => {
             </div>
 
             <section className="flex flex-col gap-5 w-full">
-            <label htmlFor="email" className="sr-only">
-              Email
+            <label htmlFor="username" className="sr-only">
+              Username
             </label>
 
             <div className="flex items-center gap-3 rounded-3xl border-default bg-surface-2 px-4 py-1">
               <MdOutlinePerson size={22} className="text-primary flex-shrink-0" />
-              <input {...register("email")} name="email" type="email" placeholder="Email" autoComplete="email" className="input-underline" />
+              <input {...register("username")} name="username" type="username" placeholder="Email" autoComplete="username" className="input-underline" />
             </div>
 
             <label htmlFor="password" className="sr-only">

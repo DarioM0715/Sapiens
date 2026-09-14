@@ -94,7 +94,7 @@ export const AsidePost = () => {
 
           <div className="flex flex-col gap-2 text-sm text-primary">
             <div>
-              <p className="font-medium">Soporte</p>
+              <p className="font-medium">Soporte:</p>
               <p className="text-muted">dariomartinezotano@gmail.com</p>
             </div>
           </div>

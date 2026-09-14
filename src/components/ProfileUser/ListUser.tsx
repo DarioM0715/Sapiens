@@ -1,7 +1,7 @@
 import type { User } from "@/types/system";
 import type { Option } from "@/types/system";
 import { useLocation } from "react-router-dom";
-import { MoreOptions } from "../Post/MoreOptions";
+import { MoreOptionsDesktop } from "../Post/MoreOptionsDesktop";
 
 //ICONS
 import { MessageSquare, User as UserIcon, UserX, Flag, UserMinus, UserPlus } from "lucide-react";
@@ -55,7 +55,7 @@ export const ListUser = ({ listuser }: { listuser: User[] }) => {
               </div>
             </div>
 
-            <MoreOptions options={options} onSelect={handleSelect} />
+            <MoreOptionsDesktop options={options} onSelect={handleSelect} />
           </div>
         );
       })}

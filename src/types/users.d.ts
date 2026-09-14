@@ -1,3 +1,5 @@
+import { Options } from "./post";
+
 export type Role = {
   id: number;
   name: "alumno" | "profesor" | "moderador";

@@ -1,5 +1,5 @@
 export type LOGIN_FORM = {
-  email: string;
+  username: string;
   password: string;
 };
 

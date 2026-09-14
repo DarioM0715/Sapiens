@@ -1,3 +1,6 @@
+import { User } from "./users";
+import { Media } from "./post";
+
 export type Contact = {
   user: User;
   last_message?: string;

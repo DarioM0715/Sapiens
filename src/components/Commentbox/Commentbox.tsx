@@ -5,14 +5,12 @@ import { Paperclip, Smile, Send } from "lucide-react";
 import { PostCard } from "../Cards/PostCard";
 import { Avatar } from "../Avatar";
 import { useAuthContext } from "@/context/AuthContext";
-import image from "@/assets/images/20260328_032700.jpg"
 
 const post = {
   id: 100,
   title: "Revisión exhaustiva de sistemas de administración de fármacos mediada por nanopartículas",
   description:
     "Revisión exhaustiva de estrategias basadas en nanopartículas para la administración dirigida de fármacos, con énfasis en la traducción clínica.",
-  image: "https://images.unsplash.com/photo-1554475901-4538ddfbccc2?w=1400&q=80&auto=format&fit=crop",
   time: "2025-10-20T10:00:00Z",
   categories: ["Revisión con peer-review", "Nanomedicina", "Artículo de revisión"],
   views: 1240,
@@ -39,7 +37,6 @@ const post = {
     name: "Equipo Editorial",
     email: "editorial@journal.example",
     password: "••••••",
-    avatar: image,
   },
 };
 
@@ -107,7 +104,7 @@ const Commentbox: React.FC = () => {
                     </div>
 
                     <div>
-                      <button type="button" aria-label="Enviar comentario" className="inline-flex items-center gap-2 px-4 py-2 btn-primary">
+                      <button type="button" aria-label="Enviar comentario" className="inline-flex items-center gap-2 px-4 py-2 btn-primary cursor-pointer">
                         <Send size={16} />
                         <span>Comentar</span>
                       </button>

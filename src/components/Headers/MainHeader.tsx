@@ -12,6 +12,16 @@ import { Avatar } from "../Avatar";
 //SHAREDS
 import { Input } from "@/shared/inputs/Input";
 
+export const Bubble = ({ number }: { number: number }) => {
+  return (
+    <div className="bg-red-600 border-4 border-gray-900 absolute rounded-full px-2 bottom-4 left-5">
+      <span className="font-bold">
+        {number}
+      </span>
+    </div>
+  )
+}
+
 export const MainHeader = () => {
   const { user } = useAuthContext();
   const { id } = user
@@ -87,10 +97,10 @@ export const MainHeader = () => {
           </div>
 
           {/* Right - Actions */}
-          <div className="flex items-center gap-4" ref={rightActionsRef}>
+          <div className="flex items-center gap-6" ref={rightActionsRef}>
             {/* Crear documento */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("post")}>
-              <button aria-label="Crear documento" aria-haspopup="true" type="button" className="p-2 rounded-md cursor-pointer hover-surface-2 transition">
+              <button aria-label="Crear documento" aria-haspopup="true" type="button" className="p-3 cursor-pointer hover-surface-2 transition rounded-full">
                 <PencilLine size={20} className="text-primary" />
               </button>
               {openPanel === "post" && <PanelOptions title="Escritura" buttons={buttonsPost} />}
@@ -98,10 +108,11 @@ export const MainHeader = () => {
 
             {/* Notificaciones */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("notifications")}>
-              <button aria-label="Notificaciones" aria-haspopup="true" type="button" className="p-2 rounded-md cursor-pointer hover-surface-2 transition">
+              <button aria-label="Notificaciones" aria-haspopup="true" type="button" className="p-3 cursor-pointer hover-surface-2 transition rounded-full">
                 <Bell size={20} className="text-primary" />
               </button>
               {openPanel === "notifications" && <PanelOptions title="Notificaciones" buttons={buttonsNotifications} />}
+              <Bubble number={5}/>
             </div>
 
             {/* user */}

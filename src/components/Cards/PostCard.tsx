@@ -1,5 +1,5 @@
 import { timeAgo } from "@/shared/utils/utilsfunctions";
-import { MoreOptions } from "../Post/MoreOptions";
+import { MoreOptionsDesktop } from "../Post/MoreOptionsDesktop";
 import { useNavigate } from "react-router-dom";
 import { Stats } from "../Post/Stats";
 import { Avatar } from "../Avatar";
@@ -70,7 +70,7 @@ export const PostCard = ({ post, className }: { post: Post, className?: string }
             </div>
           </div>
 
-        <MoreOptions options={options} onSelect={handleSelect} />
+        <MoreOptionsDesktop options={options} onSelect={handleSelect} />
       </div>
 
       {/* BODY (clicable) */}

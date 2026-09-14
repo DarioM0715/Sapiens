@@ -37,8 +37,8 @@ export const AuthProvider = ({ children }: any) => {
 
   const login = async (data: any) => {
     try {
-      const response = await apiServer.post("/auth/login", data);
-      setUser(response.data);
+      // const response = await apiServer.post("/auth/login", data);
+      setUser(data);
     } catch (error) {
       console.log("Error al login");
     }
@@ -46,8 +46,8 @@ export const AuthProvider = ({ children }: any) => {
 
   const singup = async (data: any) => {
     try {
-      const response = await apiServer.post("/auth/signup", data);
-      setUser(response.data);
+      // const response = await apiServer.post("/auth/signup", data);
+      setUser(data);
     } catch (error) {
       console.log("Error al signup");
     }

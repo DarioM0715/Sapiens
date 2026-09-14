@@ -1,3 +1,5 @@
+import { User } from "./users";
+
 export type Media = {
   id: number;
   name: string;
