@@ -117,7 +117,7 @@ export const MainHeader = () => {
 
             {/* user */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("profile")}>
-              <NavLink to="/user" className="block rounded-full focus:outline-none focus-ring-primary" aria-haspopup="true">
+              <NavLink to={`/user/${id}`} className="block rounded-full focus:outline-none focus-ring-primary" aria-haspopup="true">
                 <Avatar user={user} size={10} />
               </NavLink>
               {openPanel === "profile" && <PanelOptions title="Usuario" buttons={buttonsProfile} />}

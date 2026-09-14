@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { Camera, Upload, Save, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const EditProfile: React.FC = () => {
   const { user, updateUser } = useAuthContext();
@@ -18,6 +19,9 @@ const EditProfile: React.FC = () => {
 
   const avatarPreview = avatar || "/images/avatar-placeholder.png";
   const backgroundPreview = background;
+  const id = user?.id ?? "";
+
+  const navigate = useNavigate();
 
   const readFileAsDataURL = (file: File) => {
     return new Promise<string>((resolve, reject) => {
@@ -62,7 +66,7 @@ const EditProfile: React.FC = () => {
     setSaving(true);
     try {
       await updateUser({ name, username: alias, sex, note, avatar, background });
-      setMessage({ type: "ok", text: "Cambios guardados correctamente" });
+      navigate(`/user/${user.id}`);
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       setMessage({ type: "error", text: err?.response?.data?.message || "Error al guardar los cambios" });
@@ -87,7 +91,7 @@ const EditProfile: React.FC = () => {
             <button
               type="button"
               onClick={() => backgroundInputRef.current?.click()}
-              className="absolute right-3 bottom-3 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/90 text-sm font-medium text-primary shadow hover-surface-2 cursor-pointer"
+              className="absolute right-3 bottom-3 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-surface text-sm font-medium text-primary shadow hover-surface-2 cursor-pointer"
               title="Cambiar portada"
             >
               <Upload size={16} />
@@ -112,7 +116,7 @@ const EditProfile: React.FC = () => {
               />
               <label
                 htmlFor="avatar-upload"
-                className="absolute right-0 bottom-0 transform translate-x-2 translate-y-2 bg-white border border-[var(--color-border)] rounded-full p-2 shadow-sm cursor-pointer hover-surface-2"
+                className="absolute right-0 bottom-0 transform translate-x-2 translate-y-2 bg-surface border border-[var(--color-border)] rounded-full p-2 shadow-sm cursor-pointer hover-surface-2"
                 title="Cambiar avatar"
               >
                 <Camera size={18} className="text-primary" />
@@ -206,13 +210,7 @@ const EditProfile: React.FC = () => {
                   type="button"
                   aria-label="Cancelar"
                   onClick={() => {
-                    setName(user?.name ?? "");
-                    setAlias(user?.username ?? "");
-                    setSex(user?.sex ?? "masculino");
-                    setNote(user?.note ?? "");
-                    setAvatar(user?.avatar ?? "");
-                    setBackground(user?.background ?? "");
-                    setMessage(null);
+                    navigate(`/user/${id}`);
                   }}
                   className="px-4 py-2 rounded-lg border border-[var(--color-border)] text-primary bg-surface hover-surface-2 cursor-pointer"
                 >
