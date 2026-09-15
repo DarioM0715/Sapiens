@@ -12,10 +12,11 @@ export type User = {
   email?: string;
   password?: string;
   avatar?: string;
-  sex?: "masculino" | "femenino";
+  sex?: "masculino" | "femenino" | "otro";
   background?: string;
   note?: string;
   theme?: string;
+  emailVerified?: boolean;
   role?: Role;
   options?: Options;
 };

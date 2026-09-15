@@ -23,7 +23,7 @@ export const Bubble = ({ number }: { number: number }) => {
 }
 
 export const MainHeader = () => {
-  const { user } = useAuthContext();
+  const { user, isLoadingAuth } = useAuthContext();
   const id = user?.id ?? "";
 
   const [openPanel, setOpenPanel] = useState<string | null>(null);
@@ -55,6 +55,8 @@ export const MainHeader = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  if (isLoadingAuth || !user) return null;
 
   const buttonsPost = [
     { name: "Texto", path: "/create/article" },

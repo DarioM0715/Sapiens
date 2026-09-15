@@ -36,7 +36,11 @@ const Login = () => {
       await login(data);
       navigate("/home");
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+      const err = error as { response?: { data?: { message?: string; needsVerification?: boolean; email?: string } } };
+      if (err?.response?.data?.needsVerification) {
+        navigate(`/register?verify=${encodeURIComponent(err.response.data.email!)}`);
+        return;
+      }
       setError(err?.response?.data?.message || "Error al iniciar sesión");
     }
   };

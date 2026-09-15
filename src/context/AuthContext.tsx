@@ -9,6 +9,10 @@ interface AuthContextProps {
   logout: any;
   verifyUser: any;
   updateUser: any;
+  verifyEmail: any;
+  resendCode: any;
+  setPassword: any;
+  acceptTerms: any;
   isLoadingAuth: boolean;
 }
 
@@ -20,6 +24,10 @@ const AuthContext = createContext<AuthContextProps>({
   logout: () => {},
   verifyUser: () => {},
   updateUser: () => {},
+  verifyEmail: () => {},
+  resendCode: () => {},
+  setPassword: () => {},
+  acceptTerms: () => {},
   isLoadingAuth: true,
 });
 
@@ -43,8 +51,7 @@ export const AuthProvider = ({ children }: any) => {
   const singup = async (data: any) => {
     try {
       const response = await apiServer.post("/auth/signup", data);
-      setUser(response.data.user);
-      return response.data.user;
+      return response.data;
     } catch (error) {
       console.error("Error al signup", error);
       throw error;
@@ -71,6 +78,48 @@ export const AuthProvider = ({ children }: any) => {
     }
   };
 
+  const verifyEmail = async (data: any) => {
+    try {
+      const response = await apiServer.post("/auth/verify-email", data);
+      setUser(response.data.user);
+      return response.data;
+    } catch (error) {
+      console.error("Error al verificar el email", error);
+      throw error;
+    }
+  };
+
+  const resendCode = async (data: any) => {
+    try {
+      const response = await apiServer.post("/auth/resend-code", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error al reenviar el código", error);
+      throw error;
+    }
+  };
+
+  const setPassword = async (data: any) => {
+    try {
+      const response = await apiServer.post("/auth/set-password", data);
+      return response.data;
+    } catch (error) {
+      console.error("Error al configurar la contraseña", error);
+      throw error;
+    }
+  };
+
+  const acceptTerms = async () => {
+    try {
+      const response = await apiServer.post("/auth/accept-terms", { accepted: true });
+      setUser((prev: any) => (prev ? { ...prev, termsAccepted: true } : prev));
+      return response.data;
+    } catch (error) {
+      console.error("Error al aceptar términos", error);
+      throw error;
+    }
+  };
+
   const updateUser = async (data: any) => {
     try {
       const response = await apiServer.put("/auth/users/me", data);
@@ -87,7 +136,9 @@ export const AuthProvider = ({ children }: any) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, singup, logout, verifyUser, updateUser, isLoadingAuth }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, singup, logout, verifyUser, updateUser, verifyEmail, resendCode, setPassword, acceptTerms, isLoadingAuth }}
+    >
       {children}
     </AuthContext.Provider>
   );
