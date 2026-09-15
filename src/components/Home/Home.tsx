@@ -1,5 +1,5 @@
 import { ScrollCard } from "../Cards/ScrollCard";
-import { examplePosts } from "@/mock/mockpublic";
+import { usePosts } from "@/hooks/useContent";
 
 const Home = () => {
   const navs = [
@@ -7,7 +7,9 @@ const Home = () => {
     { name: "Siguiendo", path: "/following" },
   ];
 
-  return <ScrollCard posts={examplePosts} navs={navs} />;
+  const { data: posts = [], isLoading, isError } = usePosts();
+
+  return <ScrollCard posts={posts} navs={navs} isLoading={isLoading} isEmpty={!isLoading && !isError && posts.length === 0} />;
 };
 
 export default Home;

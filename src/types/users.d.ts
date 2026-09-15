@@ -6,7 +6,7 @@ export type Role = {
 };
 
 export type User = {
-  id: number;
+  id: string | number;
   name: string;
   username?: string;
   email?: string;

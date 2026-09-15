@@ -1,8 +1,10 @@
 import { PostCard } from "../Cards/PostCard";
 import { AsidePost } from "../AsidePost";
-import { examplePosts } from "@/mock/mockpublic";
+import { usePosts } from "@/hooks/useContent";
 
 const NotificationsArticles = () => {
+  const { data: posts = [], isLoading, isError } = usePosts();
+
   return (
     <div className="flex flex-col justify-center lg:flex-row gap-8 w-full py-5 px-5 lg:px-10 xl:px-20">
       <section className="flex-1 flex flex-col rounded-2xl bg-surface-2 border-default overflow-hidden">
@@ -17,7 +19,9 @@ const NotificationsArticles = () => {
         </nav>
 
         <div className="flex flex-col gap-4 bg-surface p-4 md:p-6 rounded-b-2xl">
-          {examplePosts.map((post) => (
+          {isLoading && <p className="py-10 text-center text-muted">Cargando publicaciones...</p>}
+          {!isLoading && !isError && posts.length === 0 && <p className="py-10 text-center text-muted">Aún no hay publicaciones.</p>}
+          {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
         </div>

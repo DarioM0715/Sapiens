@@ -1,4 +1,4 @@
-import { userlist } from "@/mock/mockusers";
+//COMPONENTS
 import { Buttonav } from "@/shared/ui/Buttonnav";
 
 // ICONS
@@ -6,12 +6,17 @@ import { Pencil, File, Plus } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { NavLink } from "react-router-dom";
 
+//HOOKS
+import { useGetUsers } from "@/hooks/useUser";
+
 export const AsidePost = () => {
   const temas = [
     { id: 1, name: "Tema 1", description: "Contenido del tema 1" },
     { id: 2, name: "Tema 2", description: "Contenido del tema 2" },
     { id: 3, name: "Tema 3", description: "Contenido del tema 3" },
   ];
+
+  const { data: users = [], isLoading, isError } = useGetUsers();
 
   return (
     <aside className="w-80 sticky -top-200 md:w-80 flex-shrink-0 px-2" aria-label="Barra lateral de publicaciones">
@@ -46,7 +51,7 @@ export const AsidePost = () => {
           <h2 className="text-lg font-semibold text-primary">Usuarios recomendados</h2>
 
           <div className="flex flex-col gap-3">
-            {userlist.map((user) => {
+            {users.map((user) => {
               const { id, name, username } = user;
 
               return (

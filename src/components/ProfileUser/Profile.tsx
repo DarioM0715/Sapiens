@@ -1,7 +1,7 @@
 import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { Buttonav } from "@/shared/ui/Buttonnav";
 import { ScrollCard } from "../Cards/ScrollCard";
-import { examplePosts } from "@/mock/mockpublic";
+import { usePosts } from "@/hooks/useContent";
 
 // INTERACES
 import type { User } from "@/types/system";
@@ -23,6 +23,8 @@ const Navs = ({ path, title, number }: { path: string; title: string; number: nu
 export const Profile = ({ user, type }: { user: User; type: boolean }) => {
   const isDesktop = useIsDesktop(1024);
   const { background, name, note, avatar } = user;
+
+  const { data: posts = [], isLoading } = usePosts();
 
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const rightActionsRef = useRef<HTMLDivElement | null>(null);
@@ -121,7 +123,7 @@ export const Profile = ({ user, type }: { user: User; type: boolean }) => {
         </div>
       </div>
 
-      <ScrollCard posts={examplePosts} navs={infonavs} />
+      <ScrollCard posts={posts} navs={infonavs} isLoading={isLoading} isEmpty={!isLoading && posts.length === 0} />
     </section>
   );
 };

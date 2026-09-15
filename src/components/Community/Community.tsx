@@ -1,9 +1,15 @@
+import { ScrollCard } from "../Cards/ScrollCard";
+import { usePosts } from "@/hooks/useContent";
+
 const Community = () => {
-    return (
-        <div className="flex justify-center bg-surface lg:flex-row gap-8 w-full py-5 px-5 lg:px-10 xl:px-20">
-            
-        </div>
-    )
-}
+  const navs = [
+    { name: "Comunidad", path: "/community" },
+    { name: "Recientes", path: "/community" },
+  ];
+
+  const { data: posts = [], isLoading, isError } = usePosts();
+
+  return <ScrollCard posts={posts} navs={navs} isLoading={isLoading} isEmpty={!isLoading && !isError && posts.length === 0} />;
+};
 
 export default Community;
