@@ -56,7 +56,7 @@ export const AsidePost = () => {
 
               return (
                 <div key={id} className="flex items-center justify-between w-full">
-                  <NavLink to="/user/:4">
+                  <NavLink to={`/user/${id}`}>
                     <div className="flex items-center gap-3">
                       <Avatar user={user} size={12} />
                       <div className="truncate">

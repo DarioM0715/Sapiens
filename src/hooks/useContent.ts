@@ -11,10 +11,10 @@ import {
 } from "@/services/content";
 import type { CreatePostPayload } from "@/services/content";
 
-export const usePosts = () => {
+export const usePosts = (userId?: string | number) => {
   return useQuery({
-    queryKey: ["posts"],
-    queryFn: fetchPosts,
+    queryKey: ["posts", userId ?? null],
+    queryFn: () => fetchPosts(userId),
   });
 };
 

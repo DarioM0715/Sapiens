@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useAuthContext } from "@/context/AuthContext";
+import type { User } from "@/types/users";
 import { Camera, Upload, Save, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -66,7 +67,7 @@ const EditProfile: React.FC = () => {
     setSaving(true);
     try {
       await updateUser({ name, username: alias, sex, note, avatar, background });
-      navigate(`/user/${user.id}`);
+      navigate(`/user/${id}`);
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } } };
       setMessage({ type: "error", text: err?.response?.data?.message || "Error al guardar los cambios" });
@@ -175,7 +176,7 @@ const EditProfile: React.FC = () => {
                 <select
                   id="gender"
                   value={sex}
-                  onChange={(e) => setSex(e.target.value)}
+                  onChange={(e) => setSex(e.target.value as NonNullable<User["sex"]>)}
                   className="w-full p-3 rounded-md bg-surface border border-[var(--color-border)] text-primary placeholder:text-muted focus:outline-none focus-ring-primary"
                 >
                   <option value="masculino">Masculino</option>

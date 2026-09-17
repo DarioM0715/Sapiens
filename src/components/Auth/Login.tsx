@@ -11,7 +11,7 @@ import { Buttonav } from "@/shared/ui/Buttonnav";
 import { ButtonAction } from "@/shared/ui/ButtonAction";
 
 // ICONS
-import { MdOutlinePerson } from "react-icons/md";
+import { MdEmail } from "react-icons/md";
 import { MdLockOutline } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { BsGoogle } from "react-icons/bs";
@@ -25,7 +25,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const { register, handleSubmit } = useForm<LOGIN_FORM>({
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
@@ -66,13 +66,13 @@ const Login = () => {
             </div>
 
             <section className="flex flex-col gap-5 w-full">
-            <label htmlFor="username" className="sr-only">
+            <label htmlFor="email" className="sr-only">
               Username
             </label>
 
             <div className="flex items-center gap-3 rounded-3xl border-default bg-surface-2 px-4 py-1">
-              <MdOutlinePerson size={22} className="text-primary flex-shrink-0" />
-              <input {...register("username")} name="username" type="username" placeholder="Email" autoComplete="username" className="input-underline" />
+              <MdEmail size={22} className="text-primary flex-shrink-0" />
+              <input {...register("email")} name="email" type="email" placeholder="Email" autoComplete="email" className="input-underline" />
             </div>
 
             <label htmlFor="password" className="sr-only">

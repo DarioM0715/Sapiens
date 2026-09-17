@@ -5,6 +5,7 @@ import {
   logout,
   verify,
   getUsers,
+  getUsersId,
   updateUser,
   verifyEmail,
   resendCode,
@@ -15,6 +16,7 @@ import {
 const router = Router();
 
 router.get("/users", getUsers);
+router.get("/users/:id", getUsersId)
 router.put("/users/me", updateUser);
 router.post("/signup", signup);
 router.post("/login", login);

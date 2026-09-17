@@ -11,8 +11,10 @@ export type CreatePostPayload = {
   categories?: string[];
 };
 
-export const fetchPosts = async (): Promise<Post[]> => {
-  const { data } = await apiServer.get<{ posts: Post[] }>("/posts");
+export const fetchPosts = async (userId?: string | number): Promise<Post[]> => {
+  const { data } = await apiServer.get<{ posts: Post[] }>("/posts", {
+    params: userId ? { userId } : undefined,
+  });
   return data.posts;
 };
 

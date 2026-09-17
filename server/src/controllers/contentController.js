@@ -79,11 +79,15 @@ const isValidId = (id, res) => {
   return true;
 };
 
-export const listPosts = async (_req, res) => {
+export const listPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }).lean();
+    const { userId } = req.query;
+    const filter = userId ? { "user.userId": String(userId) } : {};
+
+    const posts = await Post.find(filter).sort({ createdAt: -1 }).lean();
 
     const counts = await Comment.aggregate([
+      { $match: { postId: { $in: posts.map((p) => p._id) } } },
       { $group: { _id: "$postId", count: { $sum: 1 } } },
     ]);
     const countMap = Object.fromEntries(counts.map((c) => [c._id.toString(), c.count]));

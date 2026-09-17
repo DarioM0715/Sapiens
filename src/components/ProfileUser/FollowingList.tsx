@@ -1,8 +1,10 @@
-import { userlist } from "@/mock/mockusers";
+import { useUsers } from "@/hooks/useUsers";
 import { UserCard } from "./UserCard";
 import { NavLink } from "react-router-dom";
 
 const FollowingList = () => {
+  const { data: users = [], isLoading } = useUsers();
+
   const navs = [{ name: "Siguiendo", path: "/user/following" }];
 
   return (
@@ -25,9 +27,9 @@ const FollowingList = () => {
 
         {/* Contenido: mantenemos overflow-hidden aquí si lo necesitas para cortar bordes */}
         <div className="flex flex-col gap-4 bg-surface rounded-b-2xl overflow-hidden">
-          {userlist.map((user) => (
-            <UserCard key={user.id} user={user} />
-          ))}
+          {isLoading && <p className="py-10 text-center text-muted">Cargando usuarios...</p>}
+          {!isLoading && users.length === 0 && <p className="py-10 text-center text-muted">Aún no hay usuarios.</p>}
+          {!isLoading && users.map((user) => <UserCard key={user.id} user={user} />)}
         </div>
       </section>
     </div>

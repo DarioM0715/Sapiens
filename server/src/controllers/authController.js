@@ -278,14 +278,14 @@ export const acceptTerms = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ message: "username y password son requeridos" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "email y password son requeridos" });
     }
 
     const user = await prisma.user.findFirst({
-      where: { OR: [{ username: username.toLowerCase() }, { email: username.toLowerCase() }] },
+      where: { email: email.toLowerCase() } ,
     });
 
     if (!user) {
@@ -328,6 +328,29 @@ export const getUsers = async (_req, res) => {
     return res.json({ users });
   } catch (error) {
     console.error("Error al listar usuarios:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+export const getUsersId = async (req, res) => {
+  const searchId = req.params.id;
+
+  if (!searchId || !searchId.trim()) {
+    return res.status(400).json({ message: "ID inválido" });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: searchId },
+      select: selectUser,
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    return res.json({ user: publicUser(user) });
+  } catch (error) {
+    console.error("Error al buscar usuario:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 };
