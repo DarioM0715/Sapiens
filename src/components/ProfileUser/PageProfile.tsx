@@ -9,16 +9,16 @@ export const PageProfile = () => {
   const { id } = useParams();
   const { user: authUser, isLoadingAuth } = useAuthContext();
 
-  const targetId = id && !CATEGORY_SLUGS.has(id) ? id : undefined;
-  const isOwn = !targetId || (!!authUser && String(authUser.id) === targetId);
+  const targetId = (id && !CATEGORY_SLUGS.has(id) ? id : undefined) ?? authUser?.id;
+  const isOwn = !!authUser && !!targetId && String(authUser.id) === String(targetId);
 
-  const { data: otherUser, isLoading, isError } = useUser(targetId, !!targetId && !isOwn);
+  const { data: fetchedUser, isLoading, isError } = useUser(targetId);
 
   if (isLoadingAuth) {
     return <p className="py-20 text-center text-muted">Cargando perfil...</p>;
   }
 
-  const profileUser = isOwn ? authUser : otherUser;
+  const profileUser = fetchedUser ?? (isOwn ? authUser : undefined);
 
   if (!profileUser) {
     if (isLoading) {

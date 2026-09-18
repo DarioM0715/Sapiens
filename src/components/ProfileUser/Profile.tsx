@@ -2,6 +2,8 @@ import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { Buttonav } from "@/shared/ui/Buttonnav";
 import { ScrollCard } from "../Cards/ScrollCard";
 import { usePosts } from "@/hooks/useContent";
+import { useFollowUser, useUnfollowUser } from "@/hooks/useFollows";
+import { useImageContrast } from "@/hooks/useImageContrast";
 
 // INTERACES
 import type { User } from "@/types/users";
@@ -27,19 +29,34 @@ interface ProfileProps {
 
 export const Profile = ({ user, isOwn }: ProfileProps) => {
   const isDesktop = useIsDesktop(1024);
-  const { background, name, note, avatar, username } = user;
+  const { background, name, note, avatar } = user;
+  const isLightBackground = useImageContrast(background);
 
   const { data: posts = [], isLoading } = usePosts(user.id);
 
+  const followMutation = useFollowUser();
+  const unfollowMutation = useUnfollowUser();
+
   const [openPanel, setOpenPanel] = useState<string | null>(null);
-  const [following, setFollowing] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const rightActionsRef = useRef<HTMLDivElement | null>(null);
 
+  const isFollowing = user.isFollowing ?? false;
+  const isFollowPending = followMutation.isPending || unfollowMutation.isPending;
+
+  const toggleFollow = () => {
+    if (isFollowPending) return;
+    if (isFollowing) {
+      unfollowMutation.mutate(user.id);
+    } else {
+      followMutation.mutate(user.id);
+    }
+  };
+
   const profilenavs = [
     { path: `/user/${user.id}`, title: "Publicaciones", number: posts.length },
-    { path: "/user/following", title: "Siguiendo", number: 0 },
-    { path: "/user/seguidores", title: "Seguidores", number: 0 },
+    { path: `/user/${user.id}/following`, title: "Siguiendo", number: user.followingCount ?? 0 },
+    { path: `/user/${user.id}/seguidores`, title: "Seguidores", number: user.followersCount ?? 0 },
     { path: "/user/me-gusta", title: "Me gusta", number: 0 },
   ];
 
@@ -101,8 +118,20 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
               <img src={avatar} alt={`${name} avatar`} className="w-32 h-32 rounded-full object-cover" />
 
               <div className="md:mt-8 mb-4 pl-0">
-                <h2 className="text-xl md:text-2xl font-semibold text-white px-0">{name}</h2>
-                {note && <p className="text-sm mt-1 text-gray-300">{note}</p>}
+                <h2
+                  className={`text-xl md:text-2xl font-semibold px-0 ${isLightBackground ? "text-gray-900" : "text-white"}`}
+                  style={{ textShadow: isLightBackground ? "0 1px 3px rgba(255,255,255,0.7)" : "0 1px 3px rgba(0,0,0,0.7)" }}
+                >
+                  {name}
+                </h2>
+                {note && (
+                  <p
+                    className={`text-sm mt-1 ${isLightBackground ? "text-gray-700" : "text-gray-200"}`}
+                    style={{ textShadow: isLightBackground ? "0 1px 3px rgba(255,255,255,0.7)" : "0 1px 3px rgba(0,0,0,0.7)" }}
+                  >
+                    {note}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -123,10 +152,11 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
                   <>
                     <button
                       type="button"
-                      onClick={() => setFollowing((prev) => !prev)}
-                      className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface-2 border-default transition cursor-pointer"
+                      onClick={toggleFollow}
+                      disabled={isFollowPending}
+                      className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface-2 border-default transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      <span className="text-sm font-medium ">{following ? "Siguiendo" : "Seguir"}</span>
+                      <span className="text-sm font-medium ">{isFollowing ? "Siguiendo" : "Seguir"}</span>
                     </button>
 
                     <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("more")}>

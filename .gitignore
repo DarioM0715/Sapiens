@@ -29,3 +29,5 @@ coverage/
 *.log
 
 NOTES.md
+.agents
+skills-lock.json

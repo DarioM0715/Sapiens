@@ -35,6 +35,30 @@ html.dark {
   --color-muted: #94a3b8;
 }
 
+/* BASE: el fondo del documento sigue el tema para que no quede blanco */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+}
+
 /* BACKGROUNDS */
 .bg-primary {
   @apply bg-[var(--color-primary)];

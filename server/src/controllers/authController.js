@@ -319,13 +319,31 @@ export const logout = (_req, res) => {
   return res.json({ message: "Sesión cerrada" });
 };
 
-export const getUsers = async (_req, res) => {
+export const getUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       select: selectUser,
       orderBy: { createdAt: "desc" },
     });
-    return res.json({ users });
+
+    let followingIds = new Set();
+    const token = req.cookies?.token;
+    if (token) {
+      try {
+        const payload = jwt.verify(token, JWT_SECRET);
+        const follows = await prisma.follow.findMany({
+          where: { followerId: payload.id },
+          select: { followingId: true },
+        });
+        followingIds = new Set(follows.map((follow) => follow.followingId));
+      } catch {
+        followingIds = new Set();
+      }
+    }
+
+    return res.json({
+      users: users.map((user) => ({ ...user, isFollowing: followingIds.has(user.id) })),
+    });
   } catch (error) {
     console.error("Error al listar usuarios:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -348,7 +366,30 @@ export const getUsersId = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    return res.json({ user: publicUser(user) });
+
+    const [followersCount, followingCount] = await Promise.all([
+      prisma.follow.count({ where: { followingId: user.id } }),
+      prisma.follow.count({ where: { followerId: user.id } }),
+    ]);
+
+    let isFollowing = false;
+    const token = req.cookies?.token;
+    if (token) {
+      try {
+        const payload = jwt.verify(token, JWT_SECRET);
+        if (payload.id !== user.id) {
+          const exists = await prisma.follow.findUnique({
+            where: { followerId_followingId: { followerId: payload.id, followingId: user.id } },
+            select: { id: true },
+          });
+          isFollowing = !!exists;
+        }
+      } catch {
+        isFollowing = false;
+      }
+    }
+
+    return res.json({ user: { ...publicUser(user), followersCount, followingCount, isFollowing } });
   } catch (error) {
     console.error("Error al buscar usuario:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
