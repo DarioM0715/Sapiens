@@ -1,10 +1,15 @@
-import { userlist } from "@/mock/mockusers";
+//COMPONENTS
 import { Buttonav } from "@/shared/ui/Buttonnav";
 
 // ICONS
-import { Pencil, File, Plus } from "lucide-react";
+import { Pencil, File, Plus, Check } from "lucide-react";
 import { Avatar } from "./Avatar";
 import { NavLink } from "react-router-dom";
+
+//HOOKS
+import { useUsers } from "@/hooks/useUsers";
+import { useFollowUser, useUnfollowUser } from "@/hooks/useFollows";
+import { useAuthContext } from "@/context/AuthContext";
 
 export const AsidePost = () => {
   const temas = [
@@ -12,6 +17,14 @@ export const AsidePost = () => {
     { id: 2, name: "Tema 2", description: "Contenido del tema 2" },
     { id: 3, name: "Tema 3", description: "Contenido del tema 3" },
   ];
+
+  const { user: currentUser } = useAuthContext();
+  const { data: users = [], isLoading } = useUsers();
+  const followMutation = useFollowUser();
+  const unfollowMutation = useUnfollowUser();
+
+  const recommendedUsers = users.filter((user) => String(user.id) !== String(currentUser?.id));
+  const isFollowPending = followMutation.isPending || unfollowMutation.isPending;
 
   return (
     <aside className="w-80 sticky -top-200 md:w-80 flex-shrink-0 px-2" aria-label="Barra lateral de publicaciones">
@@ -46,12 +59,17 @@ export const AsidePost = () => {
           <h2 className="text-lg font-semibold text-primary">Usuarios recomendados</h2>
 
           <div className="flex flex-col gap-3">
-            {userlist.map((user) => {
-              const { id, name, username } = user;
+            {isLoading && <p className="text-sm text-muted">Cargando usuarios...</p>}
+            {!isLoading && recommendedUsers.length === 0 && (
+              <p className="text-sm text-muted">No hay usuarios para recomendar.</p>
+            )}
+
+            {recommendedUsers.map((user) => {
+              const { id, name, username, isFollowing } = user;
 
               return (
                 <div key={id} className="flex items-center justify-between w-full">
-                  <NavLink to="/user/:4">
+                  <NavLink to={`/user/${id}`}>
                     <div className="flex items-center gap-3">
                       <Avatar user={user} size={12} />
                       <div className="truncate">
@@ -62,11 +80,14 @@ export const AsidePost = () => {
                   </NavLink>
 
                   <button
-                    aria-label={`Seguir a ${name}`}
-                    className="p-2 border border-[var(--color-border)] rounded-xl transition flex items-center justify-center hover:cursor-pointer bg-surface hover-surface-2"
-                    title={`Seguir a ${name}`}
+                    type="button"
+                    onClick={() => (isFollowing ? unfollowMutation.mutate(id) : followMutation.mutate(id))}
+                    disabled={isFollowPending}
+                    aria-label={isFollowing ? `Dejar de seguir a ${name}` : `Seguir a ${name}`}
+                    className="p-2 border border-[var(--color-border)] rounded-xl transition flex items-center justify-center hover:cursor-pointer bg-surface hover-surface-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                    title={isFollowing ? `Dejar de seguir a ${name}` : `Seguir a ${name}`}
                   >
-                    <Plus size={18} className="text-primary" />
+                    {isFollowing ? <Check size={18} className="text-primary" /> : <Plus size={18} className="text-primary" />}
                   </button>
                 </div>
               );

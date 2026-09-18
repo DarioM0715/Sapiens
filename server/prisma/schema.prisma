@@ -16,20 +16,39 @@ model Role {
 }
 
 model User {
-  id         String   @id @default(cuid())
-  username   String   @unique
-  email      String   @unique
-  password   String
-  name       String   @default("")
-  avatar     String   @default("")
-  sex        String   @default("masculino")
-  background String   @default("")
-  note       String   @default("")
-  theme      String   @default("light")
-  role       Role     @relation(fields: [roleId], references: [id])
-  roleId     Int      @default(1)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id               String   @id @default(cuid())
+  username         String   @unique
+  email            String   @unique
+  password         String
+  name             String   @default("")
+  avatar           String   @default("")
+  sex              String   @default("masculino")
+  background       String   @default("")
+  note             String   @default("")
+  theme            String   @default("light")
+  emailVerified    Boolean  @default(false)
+  verificationCode String?
+  termsAccepted    Boolean  @default(false)
+  role             Role     @relation(fields: [roleId], references: [id])
+  roleId           Int      @default(1)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  following Follow[] @relation("UserFollowing")
+  followers Follow[] @relation("UserFollowers")
 
   @@map("users")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  follower    User     @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+  @@map("follows")
 }

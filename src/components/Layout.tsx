@@ -10,11 +10,11 @@ const Layout = ({ sidebarBreakpoint = 1024 }) => {
 
   return (
     // <div id="principalgrid" className="bg-surface grid min-h-dvw">
-    <div className="bg-surface">
+    <div className="bg-surface flex min-h-dvh w-full flex-col">
       <ScrollToTop />
       {isDesktop ? <MainHeader /> : <MobileHeader />}
 
-      <main className="flex items-center justify-center bg-surface">
+      <main className="flex flex-1 items-start justify-center bg-surface">
         <Outlet />
       </main>
       {!isDesktop && <Footer/>}

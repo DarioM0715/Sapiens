@@ -1,122 +1,102 @@
-//REACT
+//HOOKS
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-
-//CONTEXT
-import { useAuthContext } from "@/context/AuthContext";
+import { useSearchParams } from "react-router-dom";
 
 //COMPONENTS
-import { ButtonAction } from "@/shared/ui/ButtonAction";
-import { Buttonav } from "@/shared/ui/Buttonnav";
+import { PersonalInformation } from "./PersonalInformation";
+import { VerifyEmail } from "./VerifyEmail";
+import { RegisterPassword } from "./RegisterPassword";
+import { TermsConditions } from "./TermsConditions";
 
-//ICONS
-import { BsGoogle } from "react-icons/bs";
-import { MdOutlinePerson } from "react-icons/md";
-import { MdLockOutline } from "react-icons/md";
-import { FaUserCircle } from "react-icons/fa";
+const STEPS = ["Datos personales", "Verifica tu email", "Configura tu contraseña", "Términos y condiciones"];
 
-//TYPES
-import type { REGISTER_FORM } from "@/types/formstypes";
+const Stepper = ({ current, onStepClick }: { current: number; onStepClick: (index: number) => void }) => {
+    return (
+        <ol className="flex w-full items-center gap-2">
+            {STEPS.map((label, index) => {
+                const done = index < current;
+                const active = index === current;
+                const canGoBack = index < current;
+                return (
+                    <li key={label} className="flex flex-1 flex-col items-center gap-1.5">
+                        <button
+                            type="button"
+                            onClick={() => onStepClick(index)}
+                            disabled={!canGoBack}
+                            aria-label={label}
+                            title={canGoBack ? `Volver a ${label}` : undefined}
+                            className={`flex h-9 w-9 items-center justify-center rounded-full border-2 text-sm font-bold transition
+                ${canGoBack ? "border-green-500 bg-green-500 text-white hover:opacity-80 cursor-pointer" : ""}
+                ${active ? "border-blue-500 text-blue-600 dark:text-blue-300" : ""}
+                ${!done && !active ? "border-gray-400 text-muted cursor-not-allowed" : ""}`}
+                        >
+                            {done ? "✓" : index + 1}
+                        </button>
+                        <span
+                            className={`hidden text-center text-[11px] leading-tight sm:block ${
+                                active ? "font-semibold text-primary" : "text-muted"
+                            }`}
+                        >
+                            {label}
+                        </span>
+                    </li>
+                );
+            })}
+        </ol>
+    );
+};
 
 const Register = () => {
-  const navigate = useNavigate();
-  const { singup } = useAuthContext();
-  const [error, setError] = useState("");
-  const { handleSubmit, register } = useForm<REGISTER_FORM>({
-    defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      confirm_password: "",
-    },
-  });
+    const [searchParams] = useSearchParams();
+    const verifyParam = searchParams.get("verify") ?? "";
+    const [step, setStep] = useState<number>(0);
+    const [registeredEmail, setRegisteredEmail] = useState(verifyParam);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
-  const onSubmit = async (data: REGISTER_FORM) => {
-    setError("");
-    if (data.password !== data.confirm_password) {
-      setError("Las contraseñas no coinciden");
-      return;
-    }
-    try {
-      await singup({ username: data.username, email: data.email, password: data.password });
-      navigate("/home");
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      setError(err?.response?.data?.message || "Error al crear la cuenta");
-    }
-  };
+    const goToStep = (index: number) => {
+        setError("");
+        setSuccess("");
+        setStep(index);
+    };
 
-  return (
-    <div className="auth-bg flex flex-col gap-6 items-center justify-center w-full min-h-screen p-6 bg-surface text-primary">
-      <div className="flex w-full max-w-6xl items-center justify-center">
-        <div className="auth-card">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col items-center justify-center gap-8 py-8 px-6 sm:px-10 w-full max-w-lg"
-          >
-            <div className="flex flex-col items-center gap-3 text-center">
-              <FaUserCircle size={90} className="text-primary" />
-              <div>
-                <h1 className="text-3xl font-bold text-primary dark:text-white">Regístrate</h1>
-                <p className="mt-2 text-sm text-muted dark:text-gray-300">
-                  Crea tu cuenta para compartir artículos, seguir a otros usuarios y participar en debates.
-                </p>
-              </div>
+    return (
+        <div className="auth-bg flex flex-col gap-6 items-center justify-center w-full min-h-screen p-6 bg-surface text-primary">
+            <div className="flex w-full max-w-6xl items-center justify-center">
+                <div className="auth-card">
+                    <div className="flex flex-col items-center justify-center gap-8 py-8 px-6 sm:px-10 w-full">
+                        <Stepper current={step} onStepClick={goToStep} />
+
+                        {step === 0 && (
+                            <PersonalInformation
+                                registeredEmail={registeredEmail}
+                                setRegisteredEmail={setRegisteredEmail}
+                                error={error}
+                                setError={setError}
+                                setSuccess={setSuccess}
+                                setStep={setStep}
+                            />
+                        )}
+
+                        {step === 1 && (
+                            <VerifyEmail
+                                registeredEmail={registeredEmail}
+                                error={error}
+                                setError={setError}
+                                success={success}
+                                setSuccess={setSuccess}
+                                setStep={setStep}
+                            />
+                        )}
+
+                        {step === 2 && <RegisterPassword error={error} setError={setError} setSuccess={setSuccess} setStep={setStep} />}
+
+                        {step === 3 && <TermsConditions error={error} setError={setError} />}
+                    </div>
+                </div>
             </div>
-
-            <section className="flex flex-col gap-5 w-full">
-            <div className="flex items-center gap-3 rounded-3xl border-default bg-surface-2 px-4 py-1">
-              <MdOutlinePerson size={24} className="text-primary" />
-              <input {...register("username")} name="username" type="text" placeholder="Nombre de usuario" className="input-underline" />
-            </div>
-
-            <div className="flex items-center gap-3 rounded-3xl border-default bg-surface-2 px-4 py-1">
-              <MdOutlinePerson size={24} className="text-primary" />
-              <input {...register("email")} name="email" type="email" placeholder="Email" className="input-underline" />
-            </div>
-
-            <div className="flex items-center gap-3 rounded-3xl border-default bg-surface-2 px-4 py-1">
-              <MdLockOutline size={22} className="text-primary" />
-              <input {...register("password")} name="password" type="password" placeholder="Contraseña" className="input-underline" />
-            </div>
-
-            <div className="flex items-center gap-3 rounded-3xl border-default bg-surface-2 px-4 py-1">
-              <MdLockOutline size={22} className="text-primary" />
-              <input
-                {...register("confirm_password")}
-                name="confirm_password"
-                type="password"
-                placeholder="Confirmar contraseña"
-                className="input-underline"
-              />
-            </div>
-          </section>
-
-          {error && <p className="w-full text-center text-sm text-red-500">{error}</p>}
-
-          <div className="flex w-full justify-between text-sm">
-            <Buttonav path="/login" className="text-primary hover:underline hover:text-primary-600 visited:text-primary cursor-pointer">
-              ¿Ya tienes una cuenta? Prueba iniciar sesion
-            </Buttonav>
-          </div>
-
-          <div className="w-full">
-            <ButtonAction type="submit" color="primary" className="w-full btn-primary" aria-label="Crear cuenta">
-              Crear cuenta
-            </ButtonAction>
-          </div>
-
-          <ButtonAction type="button" color="primary" className="btn-primary flex items-center gap-4 w-full">
-            <BsGoogle size={24} />
-            Crear cuenta con Google
-          </ButtonAction>
-        </form>
-      </div>
-     
-    </div>
-  </div>
-  );
+        </div>
+    );
 };
 
 export default Register;

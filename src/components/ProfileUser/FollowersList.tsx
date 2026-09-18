@@ -1,12 +1,20 @@
-import { userlist } from "@/mock/mockusers";
+import { useParams, NavLink } from "react-router-dom";
+import { useAuthContext } from "@/context/AuthContext";
+import { useFollowers } from "@/hooks/useFollows";
 import { UserCard } from "./UserCard";
-import { NavLink } from "react-router-dom";
 
 const FollowersList = () => {
+  const { id } = useParams();
+  const { user } = useAuthContext();
+  const targetId = id ?? user?.id;
+  const isOwn = !!user && String(user.id) === String(targetId);
+
+  const { data: users = [], isLoading } = useFollowers(targetId);
+
   const navs = [
     {
       name: "Seguidores",
-      path: "/user/following",
+      path: targetId ? `/user/${targetId}/seguidores` : "/user/seguidores",
     },
   ];
 
@@ -33,9 +41,13 @@ const FollowersList = () => {
           </div>
         </nav>
         <div className="flex flex-col gap-4 bg-surface rounded-b-2xl overflow-hidden">
-          {userlist.map((user) => (
-            <UserCard key={user.id} user={user} />
-          ))}
+          {isLoading && <p className="py-10 text-center text-muted">Cargando usuarios...</p>}
+          {!isLoading && users.length === 0 && (
+            <p className="py-10 text-center text-muted">
+              {isOwn ? "No tienes seguidores." : "Este usuario no tiene seguidores."}
+            </p>
+          )}
+          {!isLoading && users.map((user) => <UserCard key={user.id} user={user} />)}
         </div>
       </section>
     </div>

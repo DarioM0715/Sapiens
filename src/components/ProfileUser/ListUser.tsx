@@ -1,4 +1,4 @@
-import type { User } from "@/types/system";
+import type { User } from "@/types/users";
 import type { Option } from "@/types/system";
 import { useLocation } from "react-router-dom";
 import { MoreOptionsDesktop } from "../Post/MoreOptionsDesktop";

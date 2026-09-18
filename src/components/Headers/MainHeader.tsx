@@ -23,8 +23,8 @@ export const Bubble = ({ number }: { number: number }) => {
 }
 
 export const MainHeader = () => {
-  const { user } = useAuthContext();
-  const { id } = user
+  const { user, isLoadingAuth } = useAuthContext();
+  const id = user?.id ?? "";
 
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const rightActionsRef = useRef<HTMLDivElement | null>(null);
@@ -55,6 +55,8 @@ export const MainHeader = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  if (isLoadingAuth || !user) return null;
 
   const buttonsPost = [
     { name: "Texto", path: "/create/article" },
@@ -117,7 +119,7 @@ export const MainHeader = () => {
 
             {/* user */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("profile")}>
-              <NavLink to="/user" className="block rounded-full focus:outline-none focus-ring-primary" aria-haspopup="true">
+              <NavLink to={`/user/${id}`} className="block rounded-full focus:outline-none focus-ring-primary" aria-haspopup="true">
                 <Avatar user={user} size={10} />
               </NavLink>
               {openPanel === "profile" && <PanelOptions title="Usuario" buttons={buttonsProfile} />}

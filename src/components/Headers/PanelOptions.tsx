@@ -14,12 +14,28 @@ export const PanelOptions = ({ title, buttons }: PanelOptionsProps) => {
       <div className="text-sm font-semibold px-2 pb-2 bg-surface-2 rounded-t-sm border-b border-[var(--color-border)]">{title}</div>
 
       <div className="flex gap-0.5 flex-col">
-        {buttons.map((button) => (
-          <NavLink to={button.path} className="flex items-center gap-5 w-full text-left px-2 py-1 hover-surface-2">
-            {button.icon && <button.icon className="text-primary" />}
-            {button.name}
-          </NavLink>
-        ))}
+        {buttons.map((button) =>
+          button.onClick ? (
+            <button
+              key={button.name ?? button.path}
+              type="button"
+              onClick={button.onClick}
+              className="flex items-center gap-5 w-full text-left px-2 py-1 hover-surface-2 cursor-pointer"
+            >
+              {button.icon && <button.icon className="text-primary" />}
+              {button.name}
+            </button>
+          ) : (
+            <NavLink
+              key={button.name ?? button.path}
+              to={button.path}
+              className="flex items-center gap-5 w-full text-left px-2 py-1 hover-surface-2"
+            >
+              {button.icon && <button.icon className="text-primary" />}
+              {button.name}
+            </NavLink>
+          )
+        )}
       </div>
     </div>
   );

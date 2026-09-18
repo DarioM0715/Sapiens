@@ -4,6 +4,7 @@ const postSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true },
     description: { type: String, default: "" },
+    content: { type: String, default: "" },
     time: { type: String, default: "" },
     categories: { type: [String], default: [] },
     views: { type: Number, default: 0 },

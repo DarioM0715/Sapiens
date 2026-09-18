@@ -1,17 +1,43 @@
-//REACT
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 //COMPONENTS
 import { ButtonAction } from "@/shared/ui/ButtonAction";
-
-// ICONS
-import { Paperclip } from "lucide-react";
+import { useCreatePost } from "@/hooks/useContent";
 
 const CreateArticle = ({ document }: { document: boolean }) => {
   const navigate = useNavigate();
 
+  const [title, setTitle] = useState("");
+  const [type, setType] = useState("");
+  const [categories, setCategories] = useState("");
+  const [institution, setInstitution] = useState("");
+  const [documentUrl, setDocumentUrl] = useState("");
+  const [body, setBody] = useState("");
+
+  const createPost = useCreatePost();
+
   const cancel = () => {
     navigate(-1);
+  };
+
+  const publish = () => {
+    if (!title.trim() || !body.trim() || createPost.isPending) return;
+
+    createPost.mutate(
+      {
+        title: title.trim(),
+        description: body.trim(),
+        content: body.trim(),
+        type: type.trim() || (document ? "Documento" : "Mensaje"),
+        categories: categories.split(",").map((c) => c.trim()).filter(Boolean),
+        institution: institution.trim() || undefined,
+        documentUrl: document ? documentUrl.trim() || undefined : undefined,
+      },
+      {
+        onSuccess: (post) => navigate(`/post/${post.id}`),
+      }
+    );
   };
 
   return (
@@ -20,48 +46,62 @@ const CreateArticle = ({ document }: { document: boolean }) => {
         <div className="flex flex-col gap-4">
           <div className="border-b border-[var(--color-border)] pb-4 font-semibold text-primary">{document ? "Publicar documento" : "Publicar mensaje"}</div>
 
-          {/* Archive */}
-          {document && (
-            <>
-              <div className="font-semibold text-primary">Archivo</div>
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <label
-                    htmlFor="attachment-upload"
-                    className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-2 border border-[var(--color-border)] text-primary cursor-pointer hover:bg-surface transition"
-                    title="Añadir archivo adjunto"
-                  >
-                    <Paperclip size={18} className="text-primary" />
-                    <span className="text-sm font-semibold">Añadir archivo</span>
-                    <input id="attachment-upload" type="file" className="sr-only" />
-                  </label>
-                </div>
-              </div>
-            </>
-          )}
-
           {/* Title */}
-          {document && (
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Introduce un título (obligatorio)"
-                className="p-3 w-full text-md font-semibold border border-[var(--color-border)] rounded-lg text-primary"
-              />
-              <div className="absolute bottom-4 right-4 flex items-center justify-end">
-                <span id="title-counter" className="text-xs text-muted">
-                  0/200
-                </span>
-              </div>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Título (obligatorio)"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={200}
+              className="p-3 w-full text-md font-semibold border border-[var(--color-border)] rounded-lg text-primary"
+            />
+            <div className="absolute bottom-4 right-4 flex items-center justify-end">
+              <span id="title-counter" className="text-xs text-muted">
+                {title.length}/200
+              </span>
             </div>
-          )}
+          </div>
 
           {/* Type + Category row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="text" placeholder="Tipo de publicación" className="p-3 w-full text-md font-semibold border border-[var(--color-border)] rounded-lg text-primary" />
+            <input
+              type="text"
+              placeholder="Tipo de publicación"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="p-3 w-full text-md font-semibold border border-[var(--color-border)] rounded-lg text-primary"
+            />
 
-            <input type="text" placeholder="Categoría" className="p-3 w-full text-md font-semibold border border-[var(--color-border)] rounded-lg text-primary" />
+            <input
+              type="text"
+              placeholder="Categorías (separadas por coma)"
+              value={categories}
+              onChange={(e) => setCategories(e.target.value)}
+              className="p-3 w-full text-md font-semibold border border-[var(--color-border)] rounded-lg text-primary"
+            />
           </div>
+
+          {/* Document specific fields */}
+          {document && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="Institución"
+                value={institution}
+                onChange={(e) => setInstitution(e.target.value)}
+                className="p-3 w-full text-md font-semibold border border-[var(--color-border)] rounded-lg text-primary"
+              />
+
+              <input
+                type="text"
+                placeholder="URL del documento o DOI"
+                value={documentUrl}
+                onChange={(e) => setDocumentUrl(e.target.value)}
+                className="p-3 w-full text-md font-semibold border border-[var(--color-border)] rounded-lg text-primary"
+              />
+            </div>
+          )}
 
           {/* Body */}
           <div className="mb-6">
@@ -72,6 +112,8 @@ const CreateArticle = ({ document }: { document: boolean }) => {
               <textarea
                 id="bodyInput"
                 placeholder="Introduce el contenido de la publicación"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
                 className="w-full min-h-[300px] text-md text-primary outline-none resize-vertical font-semibold"
               />
             </div>
@@ -90,8 +132,13 @@ const CreateArticle = ({ document }: { document: boolean }) => {
                 Cancelar
               </ButtonAction>
 
-              <ButtonAction type="button" className="inline-flex items-center gap-2 px-4 py-2 btn-primary">
-                <span>Publicar</span>
+              <ButtonAction
+                type="button"
+                onClick={publish}
+                disabled={!title.trim() || !body.trim() || createPost.isPending}
+                className="inline-flex items-center gap-2 px-4 py-2 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span>{createPost.isPending ? "Publicando..." : "Publicar"}</span>
               </ButtonAction>
             </div>
           </div>

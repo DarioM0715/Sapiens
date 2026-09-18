@@ -8,10 +8,12 @@ import type { Post } from "@/types/post";
 interface Props {
   posts: Post[];
   navs: Path[];
+  isLoading?: boolean;
+  isEmpty?: boolean;
   chidren?: React.ReactNode;
 }
 
-export const ScrollCard = ({ posts, navs }: Props) => {
+export const ScrollCard = ({ posts, navs, isLoading = false, isEmpty = false }: Props) => {
   const isDesktop = useIsDesktop(1024);
 
   return (
@@ -40,9 +42,11 @@ export const ScrollCard = ({ posts, navs }: Props) => {
         )}
 
         <div className="flex flex-col gap-4 bg-surface rounded-b-2xl overflow-hidden">
-          {posts.map((post) => (
-            <div className="border-b border-[var(--color-border)]">
-              <PostCard key={post.id} post={post} />
+          {isLoading && <p className="py-10 text-center text-muted">Cargando publicaciones...</p>}
+          {!isLoading && isEmpty && <p className="py-10 text-center text-muted">Aún no hay publicaciones.</p>}
+          {!isLoading && !isEmpty && posts.map((post) => (
+            <div key={post.id} className="border-b border-[var(--color-border)]">
+              <PostCard post={post} />
             </div>
           ))}
         </div>
