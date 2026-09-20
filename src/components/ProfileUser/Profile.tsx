@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 
 const Navs = ({ path, title, number }: { path: string; title: string; number: number }) => {
   return (
-    <Buttonav path={path} className="p-3 py-2 flex items-center gap-2 bg-surface-2 border-default rounded-xl hover-surface-2">
+    <Buttonav path={path} className="p-3 py-2 flex items-center gap-2 bg-surface border-default rounded-xl hover-surface-2">
       <span className="text-sm text-primary">{title}</span>
       <span className="text-sm font-bold text-primary">{number}</span>
     </Buttonav>
@@ -56,15 +56,15 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
   const profilenavs = [
     { path: `/user/${user.id}`, title: "Publicaciones", number: posts.length },
     { path: `/user/${user.id}/following`, title: "Siguiendo", number: user.followingCount ?? 0 },
-    { path: `/user/${user.id}/seguidores`, title: "Seguidores", number: user.followersCount ?? 0 },
-    { path: "/user/me-gusta", title: "Me gusta", number: 0 },
+    { path: `/user/${user.id}/followers`, title: "Seguidores", number: user.followersCount ?? 0 },
+    { path: `/user/${user.id}/me-gusta`, title: "Me gusta", number: 0 },
   ];
 
   const infonavs = [
     { name: "Publicaciones", path: `/user/${user.id}` },
-    { name: "Comentarios", path: "/user/comentarios" },
-    { name: "Guardados", path: "/user/guardados" },
-    { name: "Me gusta", path: "/user/me-gusta" },
+    { name: "Comentarios", path: `/user/${user.id}/comentarios` },
+    { name: "Guardados", path: `/user/${user.id}/guardados` },
+    { name: "Me gusta", path: `/user/${user.id}/me-gusta` },
   ];
 
   const handleMouseEnter = (panel: string) => {
@@ -144,7 +144,7 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
 
               <div className="relative flex gap-2 " ref={rightActionsRef}>
                 {isOwn ? (
-                  <Buttonav path="/user/editar" className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface-2 border-default transition">
+                  <Buttonav path="/user/edit" className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface hover-surface-2 border-default transition">
                     <Edit size={18} className="text-primary" />
                     <span className="text-sm font-medium text-primary">Editar</span>
                   </Buttonav>
@@ -154,13 +154,13 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
                       type="button"
                       onClick={toggleFollow}
                       disabled={isFollowPending}
-                      className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface-2 border-default transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface hover-surface-2 border-default transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       <span className="text-sm font-medium ">{isFollowing ? "Siguiendo" : "Seguir"}</span>
                     </button>
 
                     <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("more")}>
-                      <button className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface-2 border-default transition">
+                      <button className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface hover-surface-2 border-default transition">
                         <MoreHorizontal size={18} />
                       </button>
                       {openPanel === "more" && <PanelOptions title="Más" buttons={buttonsoptions} />}

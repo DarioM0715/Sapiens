@@ -11,12 +11,7 @@ const FollowersList = () => {
 
   const { data: users = [], isLoading } = useFollowers(targetId);
 
-  const navs = [
-    {
-      name: "Seguidores",
-      path: targetId ? `/user/${targetId}/seguidores` : "/user/seguidores",
-    },
-  ];
+  const navs = [{ name: "Seguidores", path: targetId ? `/user/${targetId}/followers` : "//user/followers"}];
 
   return (
     <div className="flex flex-col justify-center lg:flex-row gap-8 w-full py-5 px-5 lg:px-20 xl:px-32">
@@ -47,7 +42,7 @@ const FollowersList = () => {
               {isOwn ? "No tienes seguidores." : "Este usuario no tiene seguidores."}
             </p>
           )}
-          {!isLoading && users.map((user) => <UserCard key={user.id} user={user} />)}
+          {!isLoading && users.map((user, number) => <UserCard key={user.id} user={user} finaluser={users.length - 1} number={number}/>)}
         </div>
       </section>
     </div>

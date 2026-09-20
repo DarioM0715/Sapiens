@@ -27,7 +27,7 @@ export const ListUser = ({ listuser }: { listuser: User[] }) => {
     options.splice(1, 1);
   }
 
-  if (pathname !== "/user/seguidores") {
+  if (pathname !== "//user/followers") {
     options.splice(2, 1);
   }
 

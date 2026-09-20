@@ -37,24 +37,42 @@ const serializeUser = (user) => ({
   avatar: user?.avatar ?? "",
 });
 
-export const serializePost = (doc, commentCount = 0) => ({
-  id: doc._id.toString(),
-  title: doc.title,
-  description: doc.description ?? "",
-  content: doc.content ?? "",
-  time: (doc.createdAt ?? new Date()).toISOString(),
-  categories: doc.categories ?? [],
-  views: doc.views ?? 0,
-  messages: commentCount || doc.messages || 0,
-  likes: doc.likes ?? 0,
-  dislikes: doc.dislikes ?? 0,
-  media: doc.media ?? [],
-  user: serializeUser(doc.user),
-  institution: doc.institution ?? "",
-  type: doc.type ?? "",
-  documentUrl: doc.documentUrl ?? "",
-  bibliography: doc.bibliography ?? [],
-});
+export const serializePost = (doc, commentCount = 0, currentUserId = null) => {
+  const likedBy = doc.likedBy ?? [];
+  const dislikedBy = doc.dislikedBy ?? [];
+  const uid = currentUserId ? String(currentUserId) : null;
+  return {
+    id: doc._id.toString(),
+    title: doc.title,
+    description: doc.description ?? "",
+    content: doc.content ?? "",
+    time: (doc.createdAt ?? new Date()).toISOString(),
+    categories: doc.categories ?? [],
+    views: doc.views ?? 0,
+    messages: commentCount || doc.messages || 0,
+    likes: likedBy.length,
+    dislikes: dislikedBy.length,
+    hasLiked: uid ? likedBy.includes(uid) : false,
+    hasDisliked: uid ? dislikedBy.includes(uid) : false,
+    media: doc.media ?? [],
+    user: serializeUser(doc.user),
+    institution: doc.institution ?? "",
+    type: doc.type ?? "",
+    documentUrl: doc.documentUrl ?? "",
+    bibliography: doc.bibliography ?? [],
+  };
+};
+
+const getRequestUserId = (req) => {
+  try {
+    const token = req.cookies?.token;
+    if (!token) return null;
+    const payload = jwt.verify(token, JWT_SECRET);
+    return payload.id;
+  } catch {
+    return null;
+  }
+};
 
 const serializeComment = (doc) => ({
   id: doc._id.toString(),
@@ -91,8 +109,9 @@ export const listPosts = async (req, res) => {
       { $group: { _id: "$postId", count: { $sum: 1 } } },
     ]);
     const countMap = Object.fromEntries(counts.map((c) => [c._id.toString(), c.count]));
+    const currentUserId = getRequestUserId(req);
 
-    return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0)) });
+    return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
   } catch (error) {
     console.error("Error al listar posts:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -110,7 +129,8 @@ export const getPost = async (req, res) => {
     }
 
     const count = await Comment.countDocuments({ postId: post._id });
-    return res.json({ post: serializePost(post, count) });
+    const currentUserId = getRequestUserId(req);
+    return res.json({ post: serializePost(post, count, currentUserId) });
   } catch (error) {
     console.error("Error al obtener post:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -151,39 +171,52 @@ export const createPost = async (req, res) => {
   }
 };
 
-export const likePost = async (req, res) => {
+const toggleReaction = async (req, res, type) => {
   try {
     const { id } = req.params;
     if (!isValidId(id, res)) return;
 
-    const post = await Post.findByIdAndUpdate(id, { $inc: { likes: 1 } }, { new: true }).lean();
+    const userId = String(req.user.id);
+    const post = await Post.findById(id);
     if (!post) {
       return res.status(404).json({ message: "Publicación no encontrada" });
     }
 
-    return res.json({ post: serializePost(post) });
-  } catch (error) {
-    console.error("Error al dar like al post:", error);
-    return res.status(500).json({ message: "Error interno del servidor" });
-  }
-};
+    let likedBy = post.likedBy ?? [];
+    let dislikedBy = post.dislikedBy ?? [];
 
-export const dislikePost = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!isValidId(id, res)) return;
+    const alreadyLiked = likedBy.includes(userId);
+    const alreadyDisliked = dislikedBy.includes(userId);
 
-    const post = await Post.findByIdAndUpdate(id, { $inc: { dislikes: 1 } }, { new: true }).lean();
-    if (!post) {
-      return res.status(404).json({ message: "Publicación no encontrada" });
+    if (type === "like") {
+      if (alreadyLiked) {
+        likedBy = likedBy.filter((u) => u !== userId);
+      } else {
+        likedBy = [...likedBy, userId];
+        if (alreadyDisliked) dislikedBy = dislikedBy.filter((u) => u !== userId);
+      }
+    } else {
+      if (alreadyDisliked) {
+        dislikedBy = dislikedBy.filter((u) => u !== userId);
+      } else {
+        dislikedBy = [...dislikedBy, userId];
+        if (alreadyLiked) likedBy = likedBy.filter((u) => u !== userId);
+      }
     }
 
-    return res.json({ post: serializePost(post) });
+    await Post.updateOne({ _id: post._id }, { $set: { likedBy, dislikedBy } });
+
+    const updated = await Post.findById(id).lean();
+    const count = await Comment.countDocuments({ postId: post._id });
+    return res.json({ post: serializePost(updated, count, userId) });
   } catch (error) {
-    console.error("Error al dar dislike al post:", error);
+    console.error("Error al actualizar reacción en el post:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 };
+
+export const likePost = (req, res) => toggleReaction(req, res, "like");
+export const dislikePost = (req, res) => toggleReaction(req, res, "dislike");
 
 export const listComments = async (req, res) => {
   try {

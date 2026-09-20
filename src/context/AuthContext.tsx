@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { apiServer } from "@/services/apiServer";
 import type { User } from "@/types/users";
 import type { LOGIN_FORM, PASSWORD_FORM, REGISTER_FORM } from "@/types/formstypes";
@@ -47,6 +48,7 @@ const AuthContext = createContext<AuthContextProps>(defaultContext);
 export const useAuthContext = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
@@ -138,6 +140,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const response = await apiServer.put("/auth/users/me", data);
       setUser(response.data.user as User);
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       return response.data.user as User;
     } catch (error) {
       console.error("Error al actualizar usuario", error);

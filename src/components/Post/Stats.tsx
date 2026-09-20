@@ -15,12 +15,24 @@ type InteractButtonProps = {
   value?: number;
   onClick?: () => void;
   disabled?: boolean;
+  active?: boolean;
+  activeClass?: string;
 };
 
-const InteractButton = ({ Icon, value, onClick, disabled }: InteractButtonProps) => {
+const InteractButton = ({ Icon, value, onClick, disabled, active, activeClass }: InteractButtonProps) => {
   return (
-    <button type="button" onClick={onClick} disabled={disabled} className={`rounded-md flex items-center gap-1 hover:bg-surface ${disabled ? "cursor-default" : "cursor-pointer"}`}>
-      <Icon size={18} className={`text-muted transform transition-all duration-150 hover:scale-125 hover:stroke-blue-400`} />
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={active ? "Quitar reacción" : "Dar reacción"}
+      className={`rounded-md flex items-center gap-1 hover:bg-surface ${disabled ? "cursor-default opacity-60" : "cursor-pointer"}`}
+    >
+      <Icon
+        size={18}
+        fill={active ? "currentColor" : "none"}
+        className={`transform transition-all duration-150 hover:scale-125 ${active ? activeClass : "text-muted hover:stroke-blue-400"}`}
+      />
       <p className="text-sm">{value ?? 0}</p>
     </button>
   );
@@ -28,26 +40,38 @@ const InteractButton = ({ Icon, value, onClick, disabled }: InteractButtonProps)
 
 // COMPONENTE STATS
 export const Stats = ({ post }: Props) => {
-  const { views, messages, likes, dislikes, id } = post;
+  const { views, messages, likes, dislikes, id, hasLiked, hasDisliked } = post;
   const navigate = useNavigate();
 
   const likeMutation = useLikePost();
   const dislikeMutation = useDislikePost();
 
-  const handleNavigate = (path: string) => {
-    navigate(path);
-  };
+  const reactionPending = likeMutation.isPending || dislikeMutation.isPending;
 
   return (
     <div className="flex justify-between items-center pt-2">
       <div className="flex items-center gap-6 text-muted">
         <InteractButton Icon={Eye} value={views} />
-        <InteractButton Icon={MessageCircle} value={messages} onClick={() => handleNavigate(`/post/${id}`)} />
+        <InteractButton Icon={MessageCircle} value={messages} onClick={() => navigate(`/post/${id}`)} />
       </div>
 
       <div className="flex items-center gap-4 text-muted">
-        <InteractButton Icon={ThumbsUp} value={likes} onClick={() => likeMutation.mutate(id)} disabled={likeMutation.isPending} />
-        <InteractButton Icon={ThumbsDown} value={dislikes} onClick={() => dislikeMutation.mutate(id)} disabled={dislikeMutation.isPending} />
+        <InteractButton
+          Icon={ThumbsUp}
+          value={likes}
+          active={hasLiked}
+          activeClass="text-blue-500"
+          onClick={() => likeMutation.mutate(id)}
+          disabled={reactionPending}
+        />
+        <InteractButton
+          Icon={ThumbsDown}
+          value={dislikes}
+          active={hasDisliked}
+          activeClass="text-red-500"
+          onClick={() => dislikeMutation.mutate(id)}
+          disabled={reactionPending}
+        />
       </div>
     </div>
   );

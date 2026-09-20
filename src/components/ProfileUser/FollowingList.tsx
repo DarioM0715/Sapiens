@@ -39,7 +39,7 @@ const FollowingList = () => {
               {isOwn ? "Todavía no sigues a ningún usuario." : "Este usuario todavía no sigue a nadie."}
             </p>
           )}
-          {!isLoading && users.map((user) => <UserCard key={user.id} user={user} />)}
+          {!isLoading && users.map((user, number) => <UserCard key={user.id} user={user} finaluser={users.length - 1} number={number}/>)}
         </div>
       </section>
     </div>
@@ -47,3 +47,4 @@ const FollowingList = () => {
 };
 
 export default FollowingList;
+ 

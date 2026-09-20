@@ -41,7 +41,7 @@ const CreateArticle = ({ document }: { document: boolean }) => {
   };
 
   return (
-    <div className="flex items-center justify-center px-5 lg:px-10 xl:px-20 w-full h-screen bg-surface">
+    <div className="flex items-center justify-center px-5 lg:px-10 xl:px-20 w-full bg-surface">
       <div className="w-full my-5 mx-5 lg:mx-10 xl:mx-20 p-8 bg-surface rounded-2xl border-default shadow-md">
         <div className="flex flex-col gap-4">
           <div className="border-b border-[var(--color-border)] pb-4 font-semibold text-primary">{document ? "Publicar documento" : "Publicar mensaje"}</div>

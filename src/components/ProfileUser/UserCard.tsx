@@ -7,7 +7,7 @@ import { MoreOptionsDesktop } from "../Post/MoreOptionsDesktop";
 import { MessageSquare, User as UserIcon, UserX, Flag, UserMinus, UserPlus } from "lucide-react";
 import { Avatar } from "../Avatar";
 
-export const UserCard = ({ user }: { user: User }) => {
+export const UserCard = ({ user, number, finaluser }: { user: User, number: number, finaluser: number }) => {
   const { pathname } = useLocation();
   const { username, name, id, role } = user;
 
@@ -28,12 +28,12 @@ export const UserCard = ({ user }: { user: User }) => {
     options.splice(1, 1);
   }
 
-  if (pathname !== "/user/seguidores") {
+  if (pathname !== "//user/followers") {
     options.splice(2, 1);
   }
 
   return (
-    <div className="flex items-center justify-between gap-3 p-4 border-b border-gray-200" key={id}>
+    <div className={`flex items-center justify-between gap-3 p-4 ${finaluser !== number && "border-b border-[var(--color-border)]"}`} key={id}>
       <div className="flex items-center gap-2">
         <Avatar user={user} size={12} />
 
