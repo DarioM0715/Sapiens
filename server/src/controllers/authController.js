@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
+import Post from "../models/Post.js";
+import Comment from "../models/Comment.js";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -428,7 +430,24 @@ export const updateUser = async (req, res) => {
       select: selectUser,
     });
 
-    return res.json({ user: publicUser(user) });
+    const safe = publicUser(user);
+
+    try {
+      // Sincroniza el autor embebido en posts/comentarios (MongoDB) con los datos editados
+      const author = {
+        "user.name": safe.name,
+        "user.username": safe.username,
+        "user.avatar": safe.avatar ?? "",
+      };
+      await Promise.all([
+        Post.updateMany({ "user.userId": payload.id }, { $set: author }),
+        Comment.updateMany({ "user.userId": payload.id }, { $set: author }),
+      ]);
+    } catch (mongoError) {
+      console.error("No se pudieron sincronizar posts/comentarios tras actualizar el perfil:", mongoError);
+    }
+
+    return res.json({ user: safe });
   } catch (error) {
     if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
       return res.status(401).json({ message: "No autorizado" });
