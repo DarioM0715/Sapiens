@@ -11,6 +11,8 @@ const postSchema = new mongoose.Schema(
     messages: { type: Number, default: 0 },
     likes: { type: Number, default: 0 },
     dislikes: { type: Number, default: 0 },
+    likedBy: { type: [String], default: [] },
+    dislikedBy: { type: [String], default: [] },
     media: { type: [{ name: String, url: String }], default: [] },
     user: {
       userId: { type: String, index: true },

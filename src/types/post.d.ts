@@ -9,7 +9,7 @@ export type Media = {
 export type Options = {
   id: number;
   name: string;
-  function: any;
+  function: (...args: unknown[]) => unknown;
 };
 
 export type Like = {
@@ -36,6 +36,8 @@ export type Post = {
   messages: number;
   likes: number;
   dislikes?: number;
+  hasLiked?: boolean;
+  hasDisliked?: boolean;
   media?: Media[];
   user: User;
   institution?: string;
