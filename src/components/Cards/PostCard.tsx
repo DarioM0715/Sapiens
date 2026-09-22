@@ -1,10 +1,11 @@
+// HOOKS
 import { timeAgo } from "@/shared/utils/utilsfunctions";
 import { MoreOptionsDesktop } from "../Post/MoreOptionsDesktop";
 import { useNavigate } from "react-router-dom";
 import { Stats } from "../Post/Stats";
 import { Avatar } from "../Avatar";
 
-//INTERFACES
+//TYPES
 import type { Post } from "@/types/post";
 import type { Option } from "@/types/system";
 
@@ -31,12 +32,12 @@ export const PostCard = ({ post, className }: { post: Post, className?: string }
   const { name } = user;
 
   const options: Option[] = [
-    { id: 1, label: "Denunciar"},
-    { id: 2, label: "Bloquear usuario"},
-    { id: 3, label: "Copiar enlace"},
-    { id: 4, label: "Dejar de seguir"},
+    // { id: 1, label: "Denunciar"},
+    // { id: 2, label: "Bloquear usuario"},
+    // { id: 3, label: "Copiar enlace"},
+    // { id: 4, label: "Dejar de seguir"},
     { id: 5, label: "Guardar", Icon: Bookmark },
-    { id: 6, label: "Compartir", Icon: Share2 },
+    // { id: 6, label: "Compartir", Icon: Share2 },
     { id: 7, label: "Ver perfil", Icon: User },
   ];
 

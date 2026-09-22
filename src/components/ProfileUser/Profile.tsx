@@ -159,12 +159,12 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
                       <span className="text-sm font-medium ">{isFollowing ? "Siguiendo" : "Seguir"}</span>
                     </button>
 
-                    <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("more")}>
+                    {/* <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("more")}>
                       <button className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface hover-surface-2 border-default transition">
                         <MoreHorizontal size={18} />
                       </button>
                       {openPanel === "more" && <PanelOptions title="Más" buttons={buttonsoptions} />}
-                    </div>
+                    </div> */}
                   </>
                 )}
 

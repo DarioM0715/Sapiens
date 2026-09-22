@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchPosts,
+  fetchFollowingPosts,
   fetchPost,
   createPost,
   likePost,
@@ -15,6 +16,14 @@ export const usePosts = (userId?: string | number) => {
   return useQuery({
     queryKey: ["posts", userId ?? null],
     queryFn: () => fetchPosts(userId),
+  });
+};
+
+export const useFollowingPosts = (enabled = true) => {
+  return useQuery({
+    queryKey: ["posts", "following"],
+    queryFn: () => fetchFollowingPosts(),
+    enabled,
   });
 };
 

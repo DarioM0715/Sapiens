@@ -18,6 +18,11 @@ export const fetchPosts = async (userId?: string | number): Promise<Post[]> => {
   return data.posts;
 };
 
+export const fetchFollowingPosts = async (): Promise<Post[]> => {
+  const { data } = await apiServer.get<{ posts: Post[] }>("/posts/following");
+  return data.posts;
+};
+
 export const fetchPost = async (id: string | number): Promise<Post> => {
   const { data } = await apiServer.get<{ post: Post }>(`/posts/${id}`);
   return data.post;

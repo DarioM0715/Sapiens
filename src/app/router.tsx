@@ -56,7 +56,8 @@ export const router = createBrowserRouter([
     children: [
       { element: <AuthGuard />, children: [
         { path: "/home", element: <Home /> },
-        { path: "/community", element: <Community/>},
+        { path: "/home/following", element: <Home/>},
+        // { path: "/community", element: <Community/>},
 
         { path: "/create/article", element: <CreateArticle document={false} /> },
         { path: "/create/document", element: <CreateArticle document={true} /> },

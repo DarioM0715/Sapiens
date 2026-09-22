@@ -32,7 +32,7 @@ export const MainHeader = () => {
   const navsup = [
     { name: "Sapiens", path: "/" },
     { name: "Inicio", path: "/home" },
-    { name: "Comunidades", path: "/community" },
+    // { name: "Comunidades", path: "/community" },
   ];
 
   const handleMouseEnter = (panel: string) => {

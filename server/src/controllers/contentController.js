@@ -137,6 +137,35 @@ export const getPost = async (req, res) => {
   }
 };
 
+export const listFollowingPosts = async (req, res) => {
+  try {
+    const currentUserId = String(req.user.id);
+
+    const follows = await prisma.follow.findMany({
+      where: { followerId: currentUserId },
+      select: { followingId: true },
+    });
+    const followingIds = follows.map((f) => f.followingId);
+
+    if (followingIds.length === 0) {
+      return res.json({ posts: [] });
+    }
+
+    const posts = await Post.find({ "user.userId": { $in: followingIds } }).sort({ createdAt: -1 }).lean();
+
+    const counts = await Comment.aggregate([
+      { $match: { postId: { $in: posts.map((p) => p._id) } } },
+      { $group: { _id: "$postId", count: { $sum: 1 } } },
+    ]);
+    const countMap = Object.fromEntries(counts.map((c) => [c._id.toString(), c.count]));
+
+    return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
+  } catch (error) {
+    console.error("Error al listar posts de seguidos:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
 export const createPost = async (req, res) => {
   try {
     const { title, description = "", content = "", type = "", institution = "", documentUrl = "" } = req.body;
