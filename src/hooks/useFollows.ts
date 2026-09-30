@@ -26,6 +26,7 @@ const useFollowReaction = (mutationFn: (id: string | number) => Promise<{ isFoll
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["followers"] });
       queryClient.invalidateQueries({ queryKey: ["following"] });
+      queryClient.invalidateQueries({ queryKey: ["posts", "following"] });
     },
   });
 };

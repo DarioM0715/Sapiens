@@ -1,7 +1,7 @@
 import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { Buttonav } from "@/shared/ui/Buttonnav";
 import { ScrollCard } from "../Cards/ScrollCard";
-import { usePosts } from "@/hooks/useContent";
+import { usePosts, useSavedPosts, useLikedPosts } from "@/hooks/useContent";
 import { useFollowUser, useUnfollowUser } from "@/hooks/useFollows";
 import { useImageContrast } from "@/hooks/useImageContrast";
 
@@ -9,9 +9,9 @@ import { useImageContrast } from "@/hooks/useImageContrast";
 import type { User } from "@/types/users";
 
 // ICONS
-import { Edit, Flag, MoreHorizontal, UserLock } from "lucide-react";
-import { PanelOptions } from "../Headers/PanelOptions";
-import { useEffect, useRef, useState } from "react";
+import { Edit } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 const Navs = ({ path, title, number }: { path: string; title: string; number: number }) => {
   return (
@@ -32,14 +32,21 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
   const { background, name, note, avatar } = user;
   const isLightBackground = useImageContrast(background);
 
+  const { categoria } = useParams();
+
   const { data: posts = [], isLoading } = usePosts(user.id);
+  const { data: savedPosts = [], isLoading: savedLoading } = useSavedPosts(isOwn);
+  const { data: likedPosts = [], isLoading: likedLoading } = useLikedPosts(user.id);
+
+  const isGuardados = categoria === "guardados";
+  const isMeGusta = categoria === "me-gusta";
+  const activePosts = isGuardados ? savedPosts : isMeGusta ? likedPosts : posts;
+  const activeLoading = isGuardados ? savedLoading : isMeGusta ? likedLoading : isLoading;
 
   const followMutation = useFollowUser();
   const unfollowMutation = useUnfollowUser();
 
-  const [openPanel, setOpenPanel] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const rightActionsRef = useRef<HTMLDivElement | null>(null);
 
   const isFollowing = user.isFollowing ?? false;
   const isFollowPending = followMutation.isPending || unfollowMutation.isPending;
@@ -57,46 +64,15 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
     { path: `/user/${user.id}`, title: "Publicaciones", number: posts.length },
     { path: `/user/${user.id}/following`, title: "Siguiendo", number: user.followingCount ?? 0 },
     { path: `/user/${user.id}/followers`, title: "Seguidores", number: user.followersCount ?? 0 },
-    { path: `/user/${user.id}/me-gusta`, title: "Me gusta", number: 0 },
+    // { path: `/user/${user.id}/me-gusta`, title: "Me gusta", number: 0 },
   ];
 
   const infonavs = [
     { name: "Publicaciones", path: `/user/${user.id}` },
     { name: "Comentarios", path: `/user/${user.id}/comentarios` },
-    { name: "Guardados", path: `/user/${user.id}/guardados` },
+    ...(isOwn ? [{ name: "Guardados", path: `/user/${user.id}/guardados` }] : []),
     { name: "Me gusta", path: `/user/${user.id}/me-gusta` },
   ];
-
-  const handleMouseEnter = (panel: string) => {
-    setOpenPanel(panel);
-  };
-
-  const handleMouseLeave = () => {
-    setOpenPanel(null);
-  };
-
-  const handleAction = (action: "report" | "block") => {
-    setOpenPanel(null);
-    setNotice(action === "report" ? "Usuario denunciado (demo)" : "Usuario bloqueado (demo)");
-  };
-
-  const buttonsoptions = [
-    { name: "Denunciar usuario", path: "#", icon: Flag, onClick: () => handleAction("report") },
-    { name: "Bloquear usuario", path: "#", icon: UserLock, onClick: () => handleAction("block") },
-  ];
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (rightActionsRef.current && !rightActionsRef.current.contains(event.target as Node)) {
-        handleMouseLeave();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   useEffect(() => {
     if (!notice) return;
@@ -142,7 +118,7 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
                 ))}
               </div>
 
-              <div className="relative flex gap-2 " ref={rightActionsRef}>
+              <div className="relative flex gap-2 ">
                 {isOwn ? (
                   <Buttonav path="/user/edit" className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface hover-surface-2 border-default transition">
                     <Edit size={18} className="text-primary" />
@@ -159,12 +135,12 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
                       <span className="text-sm font-medium ">{isFollowing ? "Siguiendo" : "Seguir"}</span>
                     </button>
 
-                    <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("more")}>
+                    {/* <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("more")}>
                       <button className="flex items-center gap-2 px-6 py-2 rounded-xl bg-surface hover-surface-2 border-default transition">
                         <MoreHorizontal size={18} />
                       </button>
                       {openPanel === "more" && <PanelOptions title="Más" buttons={buttonsoptions} />}
-                    </div>
+                    </div> */}
                   </>
                 )}
 
@@ -177,7 +153,7 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
         </div>
       </div>
 
-      <ScrollCard posts={posts} navs={infonavs} isLoading={isLoading} isEmpty={!isLoading && posts.length === 0} />
+      <ScrollCard posts={activePosts} navs={infonavs} isLoading={activeLoading} isEmpty={!activeLoading && activePosts.length === 0} />
     </section>
   );
 };

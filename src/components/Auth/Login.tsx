@@ -1,9 +1,7 @@
-//REACT
+//HOOKS
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-
-//CONTEXT
 import { useAuthContext } from "@/context/AuthContext";
 
 //COMPONENTS
@@ -23,6 +21,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuthContext();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm<LOGIN_FORM>({
     defaultValues: {
       email: "",
@@ -32,6 +31,8 @@ const Login = () => {
 
   const onSubmit = async (data: LOGIN_FORM) => {
     setError("");
+    setLoading(true);
+
     try {
       await login(data);
       navigate("/home");
@@ -42,6 +43,8 @@ const Login = () => {
         return;
       }
       setError(err?.response?.data?.message || "Error al iniciar sesión");
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -99,8 +102,8 @@ const Login = () => {
           </div>
 
           <div className="w-full">
-            <ButtonAction type="submit" color="primary" className="w-full btn-primary" aria-label="Iniciar sesión">
-              Iniciar sesión
+            <ButtonAction disabled={loading} type="submit" color="primary" className="w-full btn-primary" aria-label="Iniciar sesión">
+               {loading ? "Iniciando sesión..." : "Iniciar sesión" }
             </ButtonAction>
           </div>
 

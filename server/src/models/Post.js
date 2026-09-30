@@ -13,6 +13,7 @@ const postSchema = new mongoose.Schema(
     dislikes: { type: Number, default: 0 },
     likedBy: { type: [String], default: [] },
     dislikedBy: { type: [String], default: [] },
+    savedBy: { type: [String], default: [] },
     media: { type: [{ name: String, url: String }], default: [] },
     user: {
       userId: { type: String, index: true },
