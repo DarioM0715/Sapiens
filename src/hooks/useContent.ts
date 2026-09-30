@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchPosts,
+  fetchUserReplies,
   fetchFollowingPosts,
   fetchSavedPosts,
   fetchLikedPosts,
@@ -9,9 +10,8 @@ import {
   likePost,
   dislikePost,
   savePost,
-  fetchComments,
-  addComment,
-  likeComment,
+  fetchReplies,
+  addReply,
 } from "@/services/content";
 import type { CreatePostPayload } from "@/services/content";
 
@@ -19,6 +19,14 @@ export const usePosts = (userId?: string | number) => {
   return useQuery({
     queryKey: ["posts", userId ?? null],
     queryFn: () => fetchPosts(userId),
+  });
+};
+
+export const useUserReplies = (userId?: string | number) => {
+  return useQuery({
+    queryKey: ["replies", "user", userId],
+    queryFn: () => fetchUserReplies(userId as string | number),
+    enabled: !!userId,
   });
 };
 
@@ -70,6 +78,7 @@ const usePostReaction = (mutationFn: (id: string | number) => Promise<unknown>) 
     onSuccess: (_data, id) => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["post", id] });
+      queryClient.invalidateQueries({ queryKey: ["replies"] });
     },
   });
 };
@@ -88,32 +97,22 @@ export const useSavePost = () => {
   });
 };
 
-export const useComments = (postId?: string | number) => {
+export const useReplies = (postId?: string | number) => {
   return useQuery({
-    queryKey: ["comments", postId],
-    queryFn: () => fetchComments(postId as string | number),
+    queryKey: ["replies", postId],
+    queryFn: () => fetchReplies(postId as string | number),
     enabled: !!postId,
   });
 };
 
-export const useAddComment = (postId?: string | number) => {
+export const useAddReply = (postId?: string | number) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (content: string) => addComment(postId as string | number, content),
+    mutationFn: (content: string) => addReply(postId as string | number, content),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      queryClient.invalidateQueries({ queryKey: ["replies", postId] });
       queryClient.invalidateQueries({ queryKey: ["post", postId] });
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-    },
-  });
-};
-
-export const useLikeComment = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (commentId: string | number) => likeComment(commentId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments"] });
     },
   });
 };

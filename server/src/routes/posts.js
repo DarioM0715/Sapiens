@@ -9,8 +9,8 @@ import {
   likePost,
   dislikePost,
   toggleSavePost,
-  listComments,
-  createComment,
+  listReplies,
+  createReply,
   requireAuth,
 } from "../controllers/contentController.js";
 
@@ -25,7 +25,7 @@ router.get("/:id", getPost);
 router.post("/:id/like", requireAuth, likePost);
 router.post("/:id/dislike", requireAuth, dislikePost);
 router.post("/:id/save", requireAuth, toggleSavePost);
-router.get("/:id/comments", listComments);
-router.post("/:id/comments", requireAuth, createComment);
+router.get("/:id/replies", listReplies);
+router.post("/:id/replies", requireAuth, createReply);
 
 export default router;

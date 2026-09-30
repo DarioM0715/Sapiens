@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { PrismaClient } from "@prisma/client";
 import Post from "../models/Post.js";
-import Comment from "../models/Comment.js";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -37,20 +36,21 @@ const serializeUser = (user) => ({
   avatar: user?.avatar ?? "",
 });
 
-export const serializePost = (doc, commentCount = 0, currentUserId = null) => {
+export const serializePost = (doc, replyCount = 0, currentUserId = null) => {
   const likedBy = doc.likedBy ?? [];
   const dislikedBy = doc.dislikedBy ?? [];
   const savedBy = doc.savedBy ?? [];
   const uid = currentUserId ? String(currentUserId) : null;
   return {
     id: doc._id.toString(),
-    title: doc.title,
+    parentId: doc.parentId ? doc.parentId.toString() : null,
+    title: doc.title ?? "",
     description: doc.description ?? "",
     content: doc.content ?? "",
     time: (doc.createdAt ?? new Date()).toISOString(),
     categories: doc.categories ?? [],
     views: doc.views ?? 0,
-    messages: commentCount || doc.messages || 0,
+    messages: replyCount ?? doc.messages ?? 0,
     likes: likedBy.length,
     dislikes: dislikedBy.length,
     hasLiked: uid ? likedBy.includes(uid) : false,
@@ -76,15 +76,6 @@ const getRequestUserId = (req) => {
   }
 };
 
-const serializeComment = (doc) => ({
-  id: doc._id.toString(),
-  postId: doc.postId.toString(),
-  content: doc.content,
-  likes: doc.likes ?? 0,
-  time: (doc.createdAt ?? new Date()).toISOString(),
-  user: serializeUser(doc.user),
-});
-
 const parseCategories = (value) => {
   if (Array.isArray(value)) return value.map((c) => String(c).trim()).filter(Boolean);
   if (typeof value === "string") return value.split(",").map((c) => c.trim()).filter(Boolean);
@@ -101,16 +92,16 @@ const isValidId = (id, res) => {
 
 export const listPosts = async (req, res) => {
   try {
-    const { userId } = req.query;
-    const filter = userId ? { "user.userId": String(userId) } : {};
+    const { userId, replies } = req.query;
+    const filter = userId
+      ? {
+          "user.userId": String(userId),
+          ...(replies === "true" ? { parentId: { $ne: null } } : { parentId: null }),
+        }
+      : { parentId: null };
 
     const posts = await Post.find(filter).sort({ createdAt: -1 }).lean();
-
-    const counts = await Comment.aggregate([
-      { $match: { postId: { $in: posts.map((p) => p._id) } } },
-      { $group: { _id: "$postId", count: { $sum: 1 } } },
-    ]);
-    const countMap = Object.fromEntries(counts.map((c) => [c._id.toString(), c.count]));
+    const countMap = await attachReplyCounts(posts);
     const currentUserId = getRequestUserId(req);
 
     return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
@@ -130,7 +121,7 @@ export const getPost = async (req, res) => {
       return res.status(404).json({ message: "Publicación no encontrada" });
     }
 
-    const count = await Comment.countDocuments({ postId: post._id });
+    const count = await countReplies(post._id);
     const currentUserId = getRequestUserId(req);
     return res.json({ post: serializePost(post, count, currentUserId) });
   } catch (error) {
@@ -153,13 +144,9 @@ export const listFollowingPosts = async (req, res) => {
       return res.json({ posts: [] });
     }
 
-    const posts = await Post.find({ "user.userId": { $in: followingIds } }).sort({ createdAt: -1 }).lean();
+    const posts = await Post.find({ "user.userId": { $in: followingIds }, parentId: null }).sort({ createdAt: -1 }).lean();
 
-    const counts = await Comment.aggregate([
-      { $match: { postId: { $in: posts.map((p) => p._id) } } },
-      { $group: { _id: "$postId", count: { $sum: 1 } } },
-    ]);
-    const countMap = Object.fromEntries(counts.map((c) => [c._id.toString(), c.count]));
+    const countMap = await attachReplyCounts(posts);
 
     return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
   } catch (error) {
@@ -168,21 +155,23 @@ export const listFollowingPosts = async (req, res) => {
   }
 };
 
-const attachCommentCounts = async (posts) => {
-  const counts = await Comment.aggregate([
-    { $match: { postId: { $in: posts.map((p) => p._id) } } },
-    { $group: { _id: "$postId", count: { $sum: 1 } } },
+const countReplies = async (postId) => Post.countDocuments({ parentId: postId });
+
+const attachReplyCounts = async (posts) => {
+  const counts = await Post.aggregate([
+    { $match: { parentId: { $in: posts.map((p) => p._id) } } },
+    { $group: { _id: "$parentId", count: { $sum: 1 } } },
   ]);
   return Object.fromEntries(counts.map((c) => [c._id.toString(), c.count]));
 };
 
-// Devuelve las publicaciones guardadas por el usuario actual
+// Devuelve las publicaciones guardadas por el usuario actual (solo raíces)
 export const listSavedPosts = async (req, res) => {
   try {
     const currentUserId = String(req.user.id);
 
-    const posts = await Post.find({ savedBy: currentUserId }).sort({ createdAt: -1 }).lean();
-    const countMap = await attachCommentCounts(posts);
+    const posts = await Post.find({ savedBy: currentUserId, parentId: null }).sort({ createdAt: -1 }).lean();
+    const countMap = await attachReplyCounts(posts);
 
     return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
   } catch (error) {
@@ -191,15 +180,15 @@ export const listSavedPosts = async (req, res) => {
   }
 };
 
-// Devuelve las publicaciones a las que el usuario indicado (o el actual) les dio "me gusta"
+// Devuelve las publicaciones a las que el usuario indicado (o el actual) les dio "me gusta" (solo raíces)
 export const listLikedPosts = async (req, res) => {
   try {
     const { userId } = req.query;
     const likedUserId = String(userId ?? getRequestUserId(req) ?? "");
     if (!likedUserId) return res.json({ posts: [] });
 
-    const posts = await Post.find({ likedBy: likedUserId }).sort({ createdAt: -1 }).lean();
-    const countMap = await attachCommentCounts(posts);
+    const posts = await Post.find({ likedBy: likedUserId, parentId: null }).sort({ createdAt: -1 }).lean();
+    const countMap = await attachReplyCounts(posts);
     const currentUserId = getRequestUserId(req);
 
     return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
@@ -228,7 +217,7 @@ export const toggleSavePost = async (req, res) => {
     await Post.updateOne({ _id: post._id }, { $set: { savedBy } });
 
     const updated = await Post.findById(id).lean();
-    const count = await Comment.countDocuments({ postId: post._id });
+    const count = await countReplies(post._id);
     return res.json({ post: serializePost(updated, count, userId), saved });
   } catch (error) {
     console.error("Error al guardar/quitar publicación:", error);
@@ -238,23 +227,33 @@ export const toggleSavePost = async (req, res) => {
 
 export const createPost = async (req, res) => {
   try {
-    const { title, description = "", content = "", type = "", institution = "", documentUrl = "" } = req.body;
+    const { title = "", description = "", content = "", type = "", institution = "", documentUrl = "", parentId = null } = req.body;
 
-    if (!title) {
-      return res.status(400).json({ message: "El título es obligatorio" });
-    }
     if (!description && !content) {
       return res.status(400).json({ message: "El contenido de la publicación es obligatorio" });
     }
+    if (!parentId && !title) {
+      return res.status(400).json({ message: "El título es obligatorio" });
+    }
+    if (parentId && !mongoose.isValidObjectId(parentId)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+    if (parentId) {
+      const parentExists = await Post.exists({ _id: parentId });
+      if (!parentExists) {
+        return res.status(404).json({ message: "Publicación no encontrada" });
+      }
+    }
 
     const post = await Post.create({
-      title,
+      parentId: parentId || null,
+      title: parentId ? "" : title,
       description: description || content,
       content,
       type,
       institution,
       documentUrl,
-      categories: parseCategories(req.body.categories),
+      categories: parentId ? [] : parseCategories(req.body.categories),
       user: {
         userId: req.user.id,
         name: req.user.name || req.user.username,
@@ -306,7 +305,7 @@ const toggleReaction = async (req, res, type) => {
     await Post.updateOne({ _id: post._id }, { $set: { likedBy, dislikedBy } });
 
     const updated = await Post.findById(id).lean();
-    const count = await Comment.countDocuments({ postId: post._id });
+    const count = await countReplies(post._id);
     return res.json({ post: serializePost(updated, count, userId) });
   } catch (error) {
     console.error("Error al actualizar reacción en el post:", error);
@@ -317,27 +316,31 @@ const toggleReaction = async (req, res, type) => {
 export const likePost = (req, res) => toggleReaction(req, res, "like");
 export const dislikePost = (req, res) => toggleReaction(req, res, "dislike");
 
-export const listComments = async (req, res) => {
+// Devuelve las respuestas (hijas) de una publicación. Una respuesta es una publicación con parentId
+export const listReplies = async (req, res) => {
   try {
     const { id } = req.params;
     if (!isValidId(id, res)) return;
 
-    const comments = await Comment.find({ postId: id }).sort({ createdAt: 1 }).lean();
-    return res.json({ comments: comments.map(serializeComment) });
+    const currentUserId = getRequestUserId(req);
+    const replies = await Post.find({ parentId: id }).sort({ createdAt: 1 }).lean();
+
+    return res.json({ posts: replies.map((r) => serializePost(r, 0, currentUserId)) });
   } catch (error) {
-    console.error("Error al listar comentarios:", error);
+    console.error("Error al listar respuestas:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 };
 
-export const createComment = async (req, res) => {
+// Crea una respuesta (publicación hija) dentro del hilo de otra publicación
+export const createReply = async (req, res) => {
   try {
     const { id } = req.params;
     if (!isValidId(id, res)) return;
 
     const { content } = req.body;
     if (!content || !String(content).trim()) {
-      return res.status(400).json({ message: "El comentario no puede estar vacío" });
+      return res.status(400).json({ message: "La respuesta no puede estar vacía" });
     }
 
     const postExists = await Post.exists({ _id: id });
@@ -345,8 +348,10 @@ export const createComment = async (req, res) => {
       return res.status(404).json({ message: "Publicación no encontrada" });
     }
 
-    const comment = await Comment.create({
-      postId: id,
+    const reply = await Post.create({
+      parentId: id,
+      title: "",
+      description: String(content).trim(),
       content: String(content).trim(),
       user: {
         userId: req.user.id,
@@ -356,28 +361,9 @@ export const createComment = async (req, res) => {
       },
     });
 
-    await Post.findByIdAndUpdate(id, { $inc: { messages: 1 } });
-
-    return res.status(201).json({ comment: serializeComment(comment) });
+    return res.status(201).json({ post: serializePost(reply, 0, String(req.user.id)) });
   } catch (error) {
-    console.error("Error al crear comentario:", error);
-    return res.status(500).json({ message: "Error interno del servidor" });
-  }
-};
-
-export const likeComment = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!isValidId(id, res)) return;
-
-    const comment = await Comment.findByIdAndUpdate(id, { $inc: { likes: 1 } }, { new: true }).lean();
-    if (!comment) {
-      return res.status(404).json({ message: "Comentario no encontrado" });
-    }
-
-    return res.json({ comment: serializeComment(comment) });
-  } catch (error) {
-    console.error("Error al dar like al comentario:", error);
+    console.error("Error al crear respuesta:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 };

@@ -27,6 +27,7 @@ export type Bibliography = {
 
 export type Post = {
   id: string | number;
+  parentId?: string | null;
   title: string;
   description: string;
   content?: string;
@@ -45,13 +46,4 @@ export type Post = {
   type?: string;
   documentUrl?: string;
   bibliography?: Bibliography[];
-};
-
-export type Comment = {
-  id: string | number;
-  postId: string | number;
-  content: string;
-  likes: number;
-  time: string;
-  user: User;
 };

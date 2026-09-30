@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true, trim: true },
+    parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Post", default: null, index: true },
+    title: { type: String, default: "", trim: true },
     description: { type: String, default: "" },
     content: { type: String, default: "" },
     time: { type: String, default: "" },

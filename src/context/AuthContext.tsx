@@ -141,7 +141,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await apiServer.put("/auth/users/me", data);
       setUser(response.data.user as User);
       queryClient.invalidateQueries({ queryKey: ["posts"] });
-      queryClient.invalidateQueries({ queryKey: ["comments"] });
       queryClient.invalidateQueries({ queryKey: ["user"] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
       return response.data.user as User;

@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
 import Post from "../models/Post.js";
-import Comment from "../models/Comment.js";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -433,18 +432,15 @@ export const updateUser = async (req, res) => {
     const safe = publicUser(user);
 
     try {
-      // Sincroniza el autor embebido en posts/comentarios (MongoDB) con los datos editados
+      // Sincroniza el autor embebido en posts y respuestas (MongoDB) con los datos editados
       const author = {
         "user.name": safe.name,
         "user.username": safe.username,
         "user.avatar": safe.avatar ?? "",
       };
-      await Promise.all([
-        Post.updateMany({ "user.userId": payload.id }, { $set: author }),
-        Comment.updateMany({ "user.userId": payload.id }, { $set: author }),
-      ]);
+      await Post.updateMany({ "user.userId": payload.id }, { $set: author });
     } catch (mongoError) {
-      console.error("No se pudieron sincronizar posts/comentarios tras actualizar el perfil:", mongoError);
+      console.error("No se pudieron sincronizar posts tras actualizar el perfil:", mongoError);
     }
 
     return res.json({ user: safe });

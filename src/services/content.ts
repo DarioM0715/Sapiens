@@ -1,19 +1,27 @@
 import { apiServer } from "./apiServer";
-import type { Post, Comment } from "@/types/post";
+import type { Post } from "@/types/post";
 
 export type CreatePostPayload = {
-  title: string;
+  title?: string;
   description: string;
   content?: string;
   type?: string;
   institution?: string;
   documentUrl?: string;
   categories?: string[];
+  parentId?: string | null;
 };
 
 export const fetchPosts = async (userId?: string | number): Promise<Post[]> => {
   const { data } = await apiServer.get<{ posts: Post[] }>("/posts", {
     params: userId ? { userId } : undefined,
+  });
+  return data.posts;
+};
+
+export const fetchUserReplies = async (userId: string | number): Promise<Post[]> => {
+  const { data } = await apiServer.get<{ posts: Post[] }>("/posts", {
+    params: { userId, replies: "true" },
   });
   return data.posts;
 };
@@ -60,17 +68,12 @@ export const savePost = async (id: string | number): Promise<Post> => {
   return data.post;
 };
 
-export const fetchComments = async (postId: string | number): Promise<Comment[]> => {
-  const { data } = await apiServer.get<{ comments: Comment[] }>(`/posts/${postId}/comments`);
-  return data.comments;
+export const fetchReplies = async (postId: string | number): Promise<Post[]> => {
+  const { data } = await apiServer.get<{ posts: Post[] }>(`/posts/${postId}/replies`);
+  return data.posts;
 };
 
-export const addComment = async (postId: string | number, content: string): Promise<Comment> => {
-  const { data } = await apiServer.post<{ comment: Comment }>(`/posts/${postId}/comments`, { content });
-  return data.comment;
-};
-
-export const likeComment = async (commentId: string | number): Promise<Comment> => {
-  const { data } = await apiServer.post<{ comment: Comment }>(`/comments/${commentId}/like`);
-  return data.comment;
+export const addReply = async (postId: string | number, content: string): Promise<Post> => {
+  const { data } = await apiServer.post<{ post: Post }>(`/posts/${postId}/replies`, { content });
+  return data.post;
 };

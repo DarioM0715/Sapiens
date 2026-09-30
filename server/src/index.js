@@ -5,7 +5,6 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/posts.js";
-import commentRoutes from "./routes/comments.js";
 import followRoutes from "./routes/follows.js";
 
 const app = express();
@@ -23,7 +22,6 @@ app.use(cookieParser());
 
 app.use("/auth", authRoutes);
 app.use("/posts", postRoutes);
-app.use("/comments", commentRoutes);
 app.use("/follows", followRoutes);
 
 app.get("/", (_req, res) => {

@@ -1,7 +1,7 @@
 import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { Buttonav } from "@/shared/ui/Buttonnav";
 import { ScrollCard } from "../Cards/ScrollCard";
-import { usePosts, useSavedPosts, useLikedPosts } from "@/hooks/useContent";
+import { usePosts, useUserReplies, useSavedPosts, useLikedPosts } from "@/hooks/useContent";
 import { useFollowUser, useUnfollowUser } from "@/hooks/useFollows";
 import { useImageContrast } from "@/hooks/useImageContrast";
 
@@ -35,13 +35,15 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
   const { categoria } = useParams();
 
   const { data: posts = [], isLoading } = usePosts(user.id);
+  const { data: replies = [], isLoading: repliesLoading } = useUserReplies(user.id);
   const { data: savedPosts = [], isLoading: savedLoading } = useSavedPosts(isOwn);
   const { data: likedPosts = [], isLoading: likedLoading } = useLikedPosts(user.id);
 
   const isGuardados = categoria === "guardados";
   const isMeGusta = categoria === "me-gusta";
-  const activePosts = isGuardados ? savedPosts : isMeGusta ? likedPosts : posts;
-  const activeLoading = isGuardados ? savedLoading : isMeGusta ? likedLoading : isLoading;
+  const isComentarios = categoria === "comentarios";
+  const activePosts = isGuardados ? savedPosts : isMeGusta ? likedPosts : isComentarios ? replies : posts;
+  const activeLoading = isGuardados ? savedLoading : isMeGusta ? likedLoading : isComentarios ? repliesLoading : isLoading;
 
   const followMutation = useFollowUser();
   const unfollowMutation = useUnfollowUser();
