@@ -38,6 +38,7 @@ export type Post = {
   dislikes?: number;
   hasLiked?: boolean;
   hasDisliked?: boolean;
+  hasSaved?: boolean;
   media?: Media[];
   user: User;
   institution?: string;

@@ -15,9 +15,10 @@ interface SheetProps {
   open: boolean;
   options: Option[];
   handleClose: () => void;
+  onSelect?: (option: Option) => void;
 }
 
-export const Sheet = ({open, options, handleClose} : SheetProps) => {
+export const Sheet = ({ open, options, handleClose, onSelect }: SheetProps) => {
   return (
     <>
       <div className={`fixed inset-0 bg-black/50 transition-opacity z-60 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`} 
@@ -46,7 +47,7 @@ export const Sheet = ({open, options, handleClose} : SheetProps) => {
               {options.map((opt) => (
                 <button
                   key={opt.id}
-                  // onClick={() => handleSelect(opt)}
+                  onClick={() => onSelect?.(opt)}
                   className="w-full text-left px-4 py-3 flex items-center gap-3 hover:cursor-pointer"
                 >
                   {opt.Icon ? <opt.Icon className="w-5 h-5 " /> : null}
@@ -104,7 +105,7 @@ export function MoreOptionsDesktop({ options, onSelect, initialOpen = false }: B
         <MoreVertical size={20} />
       </button>
 
-      {open && <Sheet options={options} open handleClose={handleClose}/>}
+      {open && <Sheet options={options} open handleClose={handleClose} onSelect={handleSelect} />}
     </>
   );
 }

@@ -2,10 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchPosts,
   fetchFollowingPosts,
+  fetchSavedPosts,
+  fetchLikedPosts,
   fetchPost,
   createPost,
   likePost,
   dislikePost,
+  savePost,
   fetchComments,
   addComment,
   likeComment,
@@ -24,6 +27,21 @@ export const useFollowingPosts = (enabled = true) => {
     queryKey: ["posts", "following"],
     queryFn: () => fetchFollowingPosts(),
     enabled,
+  });
+};
+
+export const useSavedPosts = (enabled = true) => {
+  return useQuery({
+    queryKey: ["posts", "saved"],
+    queryFn: () => fetchSavedPosts(),
+    enabled,
+  });
+};
+
+export const useLikedPosts = (userId?: string | number) => {
+  return useQuery({
+    queryKey: ["posts", "liked", userId ?? null],
+    queryFn: () => fetchLikedPosts(userId),
   });
 };
 
@@ -58,6 +76,17 @@ const usePostReaction = (mutationFn: (id: string | number) => Promise<unknown>) 
 
 export const useLikePost = () => usePostReaction(likePost);
 export const useDislikePost = () => usePostReaction(dislikePost);
+
+export const useSavePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string | number) => savePost(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post", id] });
+    },
+  });
+};
 
 export const useComments = (postId?: string | number) => {
   return useQuery({

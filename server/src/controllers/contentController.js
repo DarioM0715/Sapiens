@@ -40,6 +40,7 @@ const serializeUser = (user) => ({
 export const serializePost = (doc, commentCount = 0, currentUserId = null) => {
   const likedBy = doc.likedBy ?? [];
   const dislikedBy = doc.dislikedBy ?? [];
+  const savedBy = doc.savedBy ?? [];
   const uid = currentUserId ? String(currentUserId) : null;
   return {
     id: doc._id.toString(),
@@ -54,6 +55,7 @@ export const serializePost = (doc, commentCount = 0, currentUserId = null) => {
     dislikes: dislikedBy.length,
     hasLiked: uid ? likedBy.includes(uid) : false,
     hasDisliked: uid ? dislikedBy.includes(uid) : false,
+    hasSaved: uid ? savedBy.includes(uid) : false,
     media: doc.media ?? [],
     user: serializeUser(doc.user),
     institution: doc.institution ?? "",
@@ -162,6 +164,74 @@ export const listFollowingPosts = async (req, res) => {
     return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
   } catch (error) {
     console.error("Error al listar posts de seguidos:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+const attachCommentCounts = async (posts) => {
+  const counts = await Comment.aggregate([
+    { $match: { postId: { $in: posts.map((p) => p._id) } } },
+    { $group: { _id: "$postId", count: { $sum: 1 } } },
+  ]);
+  return Object.fromEntries(counts.map((c) => [c._id.toString(), c.count]));
+};
+
+// Devuelve las publicaciones guardadas por el usuario actual
+export const listSavedPosts = async (req, res) => {
+  try {
+    const currentUserId = String(req.user.id);
+
+    const posts = await Post.find({ savedBy: currentUserId }).sort({ createdAt: -1 }).lean();
+    const countMap = await attachCommentCounts(posts);
+
+    return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
+  } catch (error) {
+    console.error("Error al listar publicaciones guardadas:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Devuelve las publicaciones a las que el usuario indicado (o el actual) les dio "me gusta"
+export const listLikedPosts = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    const likedUserId = String(userId ?? getRequestUserId(req) ?? "");
+    if (!likedUserId) return res.json({ posts: [] });
+
+    const posts = await Post.find({ likedBy: likedUserId }).sort({ createdAt: -1 }).lean();
+    const countMap = await attachCommentCounts(posts);
+    const currentUserId = getRequestUserId(req);
+
+    return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
+  } catch (error) {
+    console.error("Error al listar publicaciones con me gusta:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+// Guarda/quita de guardados una publicación (toggle)
+export const toggleSavePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!isValidId(id, res)) return;
+
+    const userId = String(req.user.id);
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ message: "Publicación no encontrada" });
+    }
+
+    let savedBy = post.savedBy ?? [];
+    const saved = !savedBy.includes(userId);
+    savedBy = saved ? [...savedBy, userId] : savedBy.filter((u) => u !== userId);
+
+    await Post.updateOne({ _id: post._id }, { $set: { savedBy } });
+
+    const updated = await Post.findById(id).lean();
+    const count = await Comment.countDocuments({ postId: post._id });
+    return res.json({ post: serializePost(updated, count, userId), saved });
+  } catch (error) {
+    console.error("Error al guardar/quitar publicación:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 };

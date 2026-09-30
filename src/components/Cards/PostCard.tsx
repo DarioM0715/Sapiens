@@ -4,13 +4,14 @@ import { MoreOptionsDesktop } from "../Post/MoreOptionsDesktop";
 import { useNavigate } from "react-router-dom";
 import { Stats } from "../Post/Stats";
 import { Avatar } from "../Avatar";
+import { useSavePost } from "@/hooks/useContent";
 
 //TYPES
 import type { Post } from "@/types/post";
 import type { Option } from "@/types/system";
 
 // ICONS
-import { Bookmark, Share2, User } from "lucide-react";
+import { Bookmark, User } from "lucide-react";
 
 const CategoryBubble = ({ category }: { category: string }) => {
   return (
@@ -23,6 +24,7 @@ const CategoryBubble = ({ category }: { category: string }) => {
 
 export const PostCard = ({ post, className }: { post: Post, className?: string }) => {
   const navigate = useNavigate();
+  const saveMutation = useSavePost();
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -32,17 +34,16 @@ export const PostCard = ({ post, className }: { post: Post, className?: string }
   const { name } = user;
 
   const options: Option[] = [
-    // { id: 1, label: "Denunciar"},
-    // { id: 2, label: "Bloquear usuario"},
-    // { id: 3, label: "Copiar enlace"},
-    // { id: 4, label: "Dejar de seguir"},
-    { id: 5, label: "Guardar", Icon: Bookmark },
-    // { id: 6, label: "Compartir", Icon: Share2 },
+    { id: 5, label: post.hasSaved ? "Guardado" : "Guardar", Icon: Bookmark },
     { id: 7, label: "Ver perfil", Icon: User },
   ];
 
   const handleSelect = (option: Option) => {
-    console.log(option);
+    if (option.id === 5) {
+      saveMutation.mutate(id);
+    } else if (option.id === 7) {
+      handleNavigate(`/user/${user.id}`);
+    }
   };
 
   return (
