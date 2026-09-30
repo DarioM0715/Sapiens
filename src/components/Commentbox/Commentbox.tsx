@@ -1,37 +1,54 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useIsDesktop } from "@/shared/ui/useIsDesktop";
-import { Download, Paperclip, Smile, Send, ThumbsUp } from "lucide-react";
+import { Download, Paperclip, Smile, Send, ThumbsUp, ThumbsDown } from "lucide-react";
 import { PostCard } from "../Cards/PostCard";
 import { Avatar } from "../Avatar";
 import { useAuthContext } from "@/context/AuthContext";
-import { usePost, useComments, useAddComment, useLikeComment } from "@/hooks/useContent";
+import { usePost, useReplies, useAddReply, useLikePost, useDislikePost } from "@/hooks/useContent";
 import { timeAgo } from "@/shared/utils/utilsfunctions";
-import type { Comment } from "@/types/post";
+import type { Post } from "@/types/post";
 
-const CommentRow = ({ comment }: { comment: Comment }) => {
-  const likeComment = useLikeComment();
+const ReplyRow = ({ reply }: { reply: Post }) => {
+  const likePost = useLikePost();
+  const dislikePost = useDislikePost();
 
   return (
     <div className="p-4 bg-surface-2 border-default rounded-lg">
       <div className="flex items-center gap-3">
-        <Avatar user={comment.user} size={9} />
+        <Avatar user={reply.user} size={9} />
         <div className="flex flex-col leading-tight">
-          <p className="font-semibold text-primary text-sm">{comment.user.name || comment.user.username}</p>
-          <p className="text-xs text-muted">{timeAgo(comment.time)}</p>
+          <p className="font-semibold text-primary text-sm">{reply.user.name || reply.user.username}</p>
+          <p className="text-xs text-muted">{timeAgo(reply.time)}</p>
         </div>
       </div>
 
-      <p className="mt-3 text-primary text-sm leading-relaxed whitespace-pre-wrap">{comment.content}</p>
+      <p className="mt-3 text-primary text-sm leading-relaxed whitespace-pre-wrap">{reply.description || reply.content}</p>
 
-      <button
-        type="button"
-        onClick={() => likeComment.mutate(comment.id)}
-        className="mt-3 inline-flex items-center gap-1.5 text-xs text-muted hover:text-primary transition cursor-pointer"
-      >
-        <ThumbsUp size={14} />
-        <span>{comment.likes}</span>
-      </button>
+      <div className="mt-3 flex items-center gap-1.5">
+        <button
+          type="button"
+          aria-label="Me gusta la respuesta"
+          onClick={() => likePost.mutate(reply.id)}
+          className={`inline-flex items-center gap-1.5 text-xs transition cursor-pointer ${
+            reply.hasLiked ? "text-blue-500" : "text-muted hover:text-primary"
+          }`}
+        >
+          <ThumbsUp size={14} />
+          <span>{reply.likes}</span>
+        </button>
+        <button
+          type="button"
+          aria-label="No me gusta la respuesta"
+          onClick={() => dislikePost.mutate(reply.id)}
+          className={`inline-flex items-center gap-1.5 text-xs transition cursor-pointer ${
+            reply.hasDisliked ? "text-red-500" : "text-muted hover:text-primary"
+          }`}
+        >
+          <ThumbsDown size={14} />
+          <span>{reply.dislikes ?? 0}</span>
+        </button>
+      </div>
     </div>
   );
 };
@@ -45,12 +62,12 @@ const Commentbox: React.FC = () => {
   const [text, setText] = useState("");
 
   const { data: post, isLoading: postLoading } = usePost(id);
-  const { data: comments = [], isLoading: commentsLoading } = useComments(id);
-  const addComment = useAddComment(id);
+  const { data: replies = [], isLoading: repliesLoading } = useReplies(id);
+  const addReply = useAddReply(id);
 
   const handleSubmit = () => {
-    if (!text.trim() || addComment.isPending) return;
-    addComment.mutate(text.trim(), {
+    if (!text.trim() || addReply.isPending) return;
+    addReply.mutate(text.trim(), {
       onSuccess: () => setText(""),
       onError: () => navigate("/login"),
     });
@@ -139,11 +156,11 @@ const Commentbox: React.FC = () => {
                           type="button"
                           aria-label="Enviar comentario"
                           onClick={handleSubmit}
-                          disabled={!text.trim() || addComment.isPending}
+                          disabled={!text.trim() || addReply.isPending}
                           className="inline-flex items-center gap-2 px-4 py-2 btn-primary cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Send size={16} />
-                          <span>{addComment.isPending ? "Enviando..." : "Comentar"}</span>
+                          <span>{addReply.isPending ? "Enviando..." : "Comentar"}</span>
                         </button>
                       </div>
                     </div>
@@ -160,10 +177,10 @@ const Commentbox: React.FC = () => {
             )}
 
             <div className="flex flex-col gap-4">
-              {commentsLoading && <p className="py-4 text-center text-muted">Cargando comentarios...</p>}
-              {!commentsLoading && comments.length === 0 && <p className="py-4 text-center text-muted">Aún no hay comentarios, ¡sé el primero!</p>}
-              {comments.map((comment) => (
-                <CommentRow key={comment.id} comment={comment} />
+              {repliesLoading && <p className="py-4 text-center text-muted">Cargando respuestas...</p>}
+              {!repliesLoading && replies.length === 0 && <p className="py-4 text-center text-muted">Aún no hay respuestas, ¡sé el primero!</p>}
+              {replies.map((reply) => (
+                <ReplyRow key={reply.id} reply={reply} />
               ))}
             </div>
           </div>

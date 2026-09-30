@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import Post from "../src/models/Post.js";
-import Comment from "../src/models/Comment.js";
 
 const prisma = new PrismaClient();
 
@@ -70,7 +69,6 @@ const seed = async () => {
   };
 
   await Post.deleteMany({});
-  await Comment.deleteMany({});
   console.log("Contenido anterior eliminado");
 
   const postsData = [
@@ -145,7 +143,7 @@ const seed = async () => {
     console.log(`Post "${data.title}" -> ${at(i).username}`);
   }
 
-  const commentsData = [
+  const repliesData = [
     { post: created[0], content: "Excelente resumen, ¿qué opinas de la edición germinal en humanos?", likes: 4 },
     { post: created[0], content: "Gracias por mencionar los efectos fuera de objetivo, se subestiman mucho.", likes: 2 },
     { post: created[1], content: "Muy buena revisión clínica, el apartado de biocompatibilidad es clave.", likes: 3 },
@@ -155,15 +153,18 @@ const seed = async () => {
     { post: created[4], content: "¿Cuál recomiendas para flujos con separación de capa límite?", likes: 1 },
   ];
 
-  for (const [i, c] of commentsData.entries()) {
-    await Comment.create({ postId: c.post._id, content: c.content, likes: c.likes, user: at(i + 2) });
+  for (const [i, r] of repliesData.entries()) {
+    const likedBy = seedUsers.slice(0, r.likes).map((u) => u.id);
+    await Post.create({
+      parentId: r.post._id,
+      title: "",
+      description: r.content,
+      content: r.content,
+      likedBy,
+      user: at(i + 2),
+    });
   }
-  console.log(`${commentsData.length} comentarios creados`);
-
-  for (const post of created) {
-    const count = await Comment.countDocuments({ postId: post._id });
-    await Post.findByIdAndUpdate(post._id, { messages: count });
-  }
+  console.log(`${repliesData.length} respuestas creadas`);
 };
 
 seed()
