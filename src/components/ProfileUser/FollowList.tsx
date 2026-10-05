@@ -5,15 +5,17 @@ import type { User } from "@/types/users";
 type FollowListProps = {
     users: User[];
     isLoading: boolean;
-    navs: {
-        name: string
-        path: string
-    }[]
     isOwn: boolean
     messages: string[]
+    targetId: string | number
 }
 
-const FollowList = ({users, isLoading, navs, isOwn}: FollowListProps) => {
+const FollowList = ({users, isLoading, targetId, isOwn}: FollowListProps) => {
+
+  const navs = [
+    { name: "Siguiendo", path: targetId ? `/user/${targetId}/following` : "/user/following" },
+    { name: "Seguidores", path: targetId ? `/user/${targetId}/followers` : "//user/followers"},
+  ];
 
   return (
     <div className="flex flex-col justify-center lg:flex-row gap-8 w-full py-5 px-5 lg:px-20 xl:px-32">
