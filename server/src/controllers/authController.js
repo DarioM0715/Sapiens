@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
 import Post from "../models/Post.js";
-import Comment from "../models/Comment.js";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -52,7 +51,32 @@ const setAuthCookie = (res, user) => {
   res.cookie("token", token, COOKIE_OPTIONS);
 };
 
+const codeMatches = (submitted = "", expected = "") => {
+  const a = Buffer.from(String(submitted));
+  const b = Buffer.from(String(expected));
+  if (a.length !== b.length || a.length === 0) return false;
+  return crypto.timingSafeEqual(a, b);
+};
+
+
 const generateCode = () => String(Math.floor(100000 + Math.random() * 900000));
+
+const deliverCode = async (email, code) => {
+  const devMode = process.env.RESEND_DEV_MODE === "true";
+
+  try {
+    await sendVerificationEmail(email, code);
+    console.log(`[EMAIL] Código enviado a ${email}`);
+  } catch (error) {
+    console.error(`[EMAIL] No se pudo enviar el código a ${email}:`, error?.message ?? error);
+  }
+
+  if (devMode) {
+    console.log(`[DEV] Código de verificación para ${email}: ${code}`);
+  }
+
+  return { devCode: devMode ? code : null };
+};
 
 const sendVerificationEmail = async (email, code) => {
   const apiKey = process.env.RESEND_API_KEY;
@@ -101,41 +125,40 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "username y email son requeridos" });
     }
 
+    const normalizedUsername = String(username).toLowerCase();
+    const normalizedEmail = String(email).toLowerCase();
+
     const existing = await prisma.user.findFirst({
-      where: { OR: [{ username: username.toLowerCase() }, { email: email.toLowerCase() }] },
+      where: { OR: [{ username: normalizedUsername }, { email: normalizedEmail }] },
       select: { username: true, email: true },
     });
     if (existing) {
       const message =
-        existing.username === username.toLowerCase()
+        existing.username === normalizedUsername
           ? "El nombre de usuario ya está en uso"
           : "El email ya está registrado";
       return res.status(409).json({ message });
     }
 
-    const placeholderPassword = await bcrypt.hash(crypto.randomBytes(24).toString("hex"), 10);
     const code = generateCode();
-    const hashedCode = await bcrypt.hash(code, 10);
+    const delivery = await deliverCode(normalizedEmail, code);
 
-    const user = await prisma.user.create({
-      data: {
-        username: username.toLowerCase(),
-        email: email.toLowerCase(),
-        password: placeholderPassword,
-        name,
-        sex,
-        emailVerified: false,
-        verificationCode: hashedCode,
-        roleId: 1,
-      },
-      select: selectUser,
+    setSignupCookie(res, {
+      email: normalizedEmail,
+      username: normalizedUsername,
+      name,
+      sex,
+      code,
+      emailVerified: false,
     });
 
-    await sendVerificationEmail(user.email, code);
-
     return res.status(201).json({
-      message: "Cuenta creada. Revisa tu email para verificar tu cuenta.",
+      message: delivery.devCode
+        ? "Datos guardados (modo dev). Usa el código devCode para verificar tu cuenta."
+        : "Datos guardados. Revisa tu email para verificar tu cuenta.",
       needsEmailVerification: true,
+      email: normalizedEmail,
+      devCode: delivery.devCode,
     });
   } catch (error) {
     console.error("Error en signup:", error);
@@ -145,37 +168,34 @@ export const signup = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
   try {
-    const { email, code } = req.body;
+    const draft = requireSignupDraft(req, res);
+    if (!draft) return;
 
-    if (!email || !code) {
-      return res.status(400).json({ message: "email y code son requeridos" });
-    }
+    const { code } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-    if (!user) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
+    if (!code) {
+      return res.status(400).json({ message: "code es requerido" });
     }
-    if (user.emailVerified) {
+    if (draft.emailVerified) {
       return res.status(400).json({ message: "El email ya fue verificado" });
     }
-    if (!user.verificationCode) {
-      return res.status(400).json({ message: "No hay código pendiente. Solicita uno nuevo." });
-    }
-
-    const match = await bcrypt.compare(code, user.verificationCode);
-    if (!match) {
+    if (!codeMatches(code, draft.code)) {
       return res.status(400).json({ message: "Código incorrecto" });
     }
 
-    const updated = await prisma.user.update({
-      where: { id: user.id },
-      data: { emailVerified: true, verificationCode: null },
-      select: selectUser,
+    setSignupCookie(res, {
+      email: draft.email,
+      username: draft.username,
+      name: draft.name,
+      sex: draft.sex,
+      emailVerified: true,
     });
 
-    const safe = publicUser(updated);
-    setAuthCookie(res, safe);
-    return res.json({ message: "Email verificado correctamente", user: safe });
+    return res.json({
+      message: "Email verificado correctamente",
+      email: draft.email,
+      nextStep: 2,
+    });
   } catch (error) {
     console.error("Error en verifyEmail:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -184,30 +204,33 @@ export const verifyEmail = async (req, res) => {
 
 export const resendCode = async (req, res) => {
   try {
+    const draft = requireSignupDraft(req, res);
+    if (!draft) return;
+
     const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({ message: "email es requerido" });
+    if (email && String(email).toLowerCase() !== draft.email) {
+      return res.status(404).json({ message: "No hay un registro pendiente para este email" });
     }
-
-    const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-    if (!user) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
-    if (user.emailVerified) {
+    if (draft.emailVerified) {
       return res.status(400).json({ message: "El email ya fue verificado" });
     }
 
     const code = generateCode();
-    const hashedCode = await bcrypt.hash(code, 10);
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { verificationCode: hashedCode },
+    const delivery = await deliverCode(draft.email, code);
+
+    setSignupCookie(res, {
+      email: draft.email,
+      username: draft.username,
+      name: draft.name,
+      sex: draft.sex,
+      code,
+      emailVerified: false,
     });
 
-    await sendVerificationEmail(user.email, code);
-
-    return res.json({ message: "Código reenviado. Revisa tu email." });
+    return res.json({
+      message: delivery.devCode ? "Código reenviado (modo dev)." : "Código reenviado. Revisa tu email.",
+      devCode: delivery.devCode,
+    });
   } catch (error) {
     console.error("Error en resendCode:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -216,12 +239,9 @@ export const resendCode = async (req, res) => {
 
 export const setPassword = async (req, res) => {
   try {
-    const token = req.cookies?.token;
-    if (!token) {
-      return res.status(401).json({ message: "No autorizado" });
-    }
+    const draft = requireSignupDraft(req, res, { verified: true });
+    if (!draft) return;
 
-    const payload = jwt.verify(token, JWT_SECRET);
     const { password } = req.body;
 
     if (!password) {
@@ -231,18 +251,19 @@ export const setPassword = async (req, res) => {
       return res.status(400).json({ message: "La contraseña debe tener al menos 8 caracteres" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.update({
-      where: { id: payload.id },
-      data: { password: hashedPassword },
-      select: selectUser,
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    setSignupCookie(res, {
+      email: draft.email,
+      username: draft.username,
+      name: draft.name,
+      sex: draft.sex,
+      emailVerified: true,
+      passwordHash,
     });
 
-    return res.json({ message: "Contraseña configurada correctamente", user: publicUser(user) });
+    return res.json({ message: "Contraseña configurada correctamente", nextStep: 3 });
   } catch (error) {
-    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "No autorizado" });
-    }
     console.error("Error en setPassword:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
@@ -250,29 +271,52 @@ export const setPassword = async (req, res) => {
 
 export const acceptTerms = async (req, res) => {
   try {
-    const token = req.cookies?.token;
-    if (!token) {
-      return res.status(401).json({ message: "No autorizado" });
-    }
+    const draft = requireSignupDraft(req, res, { verified: true });
+    if (!draft) return;
 
-    const payload = jwt.verify(token, JWT_SECRET);
     const { accepted } = req.body;
 
     if (accepted !== true) {
       return res.status(400).json({ message: "Debes aceptar los términos y condiciones" });
     }
+    if (!draft.passwordHash) {
+      return res.status(400).json({ message: "Debes configurar tu contraseña antes de continuar" });
+    }
 
-    const user = await prisma.user.update({
-      where: { id: payload.id },
-      data: { termsAccepted: true },
+    const existing = await prisma.user.findFirst({
+      where: { OR: [{ username: draft.username }, { email: draft.email }] },
+      select: { username: true, email: true },
+    });
+    if (existing) {
+      res.clearCookie(SIGNUP_COOKIE);
+      const message =
+        existing.username === draft.username
+          ? "El nombre de usuario ya está en uso"
+          : "El email ya está registrado";
+      return res.status(409).json({ message });
+    }
+
+    const created = await prisma.user.create({
+      data: {
+        username: draft.username,
+        email: draft.email,
+        password: draft.passwordHash,
+        name: draft.name ?? "",
+        sex: draft.sex ?? "masculino",
+        emailVerified: true,
+        verificationCode: null,
+        termsAccepted: true,
+        roleId: 1,
+      },
       select: selectUser,
     });
 
-    return res.json({ message: "Términos aceptados correctamente", user: publicUser(user) });
+    res.clearCookie(SIGNUP_COOKIE);
+
+    const safe = publicUser(created);
+    setAuthCookie(res, safe);
+    return res.status(201).json({ message: "¡Cuenta creada con éxito!", user: safe });
   } catch (error) {
-    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "No autorizado" });
-    }
     console.error("Error en acceptTerms:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
