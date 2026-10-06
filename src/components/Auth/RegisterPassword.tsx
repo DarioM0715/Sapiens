@@ -8,22 +8,16 @@ import type { StepChanger, StringChanger } from "./registerTypes";
 import { useForm } from "react-hook-form";
 import { MdLockOutline } from "react-icons/md";
 
-const passwordStrength = (password: string): number => {
-    const rules = [
-        password.length >= 8,
-        /[A-Z]/.test(password),
-        /[a-z]/.test(password),
-        /\d/.test(password),
-        /[^A-Za-z0-9]/.test(password),
-    ];
-    return rules.filter(Boolean).length;
-};
-
-const strengthLabel = (score: number): { label: string; color: string; width: string } => {
-    if (score <= 1) return { label: "Débil", color: "bg-red-500", width: "20%" };
-    if (score <= 3) return { label: "Media", color: "bg-yellow-500", width: "60%" };
-    return { label: "Fuerte", color: "bg-green-500", width: "100%" };
-};
+// const passwordStrength = (password: string): number => {
+//     const rules = [
+//         password.length >= 8,
+//         /[A-Z]/.test(password),
+//         /[a-z]/.test(password),
+//         /\d/.test(password),
+//         /[^A-Za-z0-9]/.test(password),
+//     ];
+//     return rules.filter(Boolean).length;
+// };
 
 type RegisterPasswordProps = {
     error: string;
@@ -45,8 +39,6 @@ export const RegisterPassword = ({ error, setError, setSuccess, setStep }: Regis
     });
 
     const password = watch("password");
-    const strength = passwordStrength(password ?? "");
-    const strengthBar = strengthLabel(strength);
 
     const onPasswordSubmit = async (data: PASSWORD_FORM) => {
         setError("");
@@ -83,17 +75,6 @@ export const RegisterPassword = ({ error, setError, setSuccess, setStep }: Regis
                             className="input-underline"
                         />
                     </div>
-                    {password && (
-                        <div className="mt-2 flex items-center gap-2">
-                            <div className="flex-1 h-1.5 rounded-full bg-surface-2 overflow-hidden">
-                                <div
-                                    className={`h-full rounded-full transition-all ${strengthBar.color}`}
-                                    style={{ width: strengthBar.width }}
-                                />
-                            </div>
-                            <span className="text-xs text-muted">{strengthBar.label}</span>
-                        </div>
-                    )}
                     {passwordErrors.password && (
                         <p className="mt-1 text-xs text-red-500">{passwordErrors.password.message}</p>
                     )}

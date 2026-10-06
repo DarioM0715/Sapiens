@@ -23,7 +23,7 @@ type VerifyEmailProps = {
 };
 
 export const VerifyEmail = ({ registeredEmail, error, setError, success, setSuccess, setStep }: VerifyEmailProps) => {
-    const { user, verifyEmail, resendCode } = useAuthContext();
+    const { verifyEmail, resendCode } = useAuthContext();
     const [code, setCode] = useState<string[]>(EMPTY_CODE);
     const codeInputs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -46,10 +46,6 @@ export const VerifyEmail = ({ registeredEmail, error, setError, success, setSucc
     const handleVerify = async () => {
         setError("");
         setSuccess("");
-        if (user?.emailVerified) {
-            setStep(2);
-            return;
-        }
         try {
             await verifyEmail({ email: registeredEmail, code: code.join("") });
             setStep(2);
@@ -88,11 +84,6 @@ export const VerifyEmail = ({ registeredEmail, error, setError, success, setSucc
             </div>
 
             <section className="flex flex-col gap-5 w-full">
-                {user?.emailVerified && (
-                    <p className="w-full text-center text-sm text-green-500">
-                        Tu email ya está verificado. Continúa con la configuración de tu cuenta.
-                    </p>
-                )}
                 <div className="flex justify-center gap-3">
                     {code.map((digit, index) => (
                         <input

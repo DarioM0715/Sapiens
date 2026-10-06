@@ -9,9 +9,9 @@ export type VerifyEmailPayload = { email: string; code: string };
 export type ResendCodePayload = { email: string };
 export type PasswordPayload = Pick<PASSWORD_FORM, "password">;
 
-type AuthResponse = { user: User };
-type SignupResponse = { message?: string; needsEmailVerification?: boolean };
-type Result = { message?: string };
+type SignupResponse = { message?: string; needsEmailVerification?: boolean; email?: string };
+type VerifyEmailResponse = { message?: string; email?: string; nextStep?: number };
+type Result = { message?: string; nextStep?: number; user?: User };
 
 interface AuthContextProps {
   user: User | null;
@@ -21,7 +21,7 @@ interface AuthContextProps {
   logout: () => Promise<void>;
   verifyUser: () => Promise<User | null>;
   updateUser: (data: Partial<User>) => Promise<User>;
-  verifyEmail: (data: VerifyEmailPayload) => Promise<AuthResponse>;
+  verifyEmail: (data: VerifyEmailPayload) => Promise<VerifyEmailResponse>;
   resendCode: (data: ResendCodePayload) => Promise<Result>;
   setPassword: (data: PasswordPayload) => Promise<Result>;
   acceptTerms: () => Promise<Result>;
@@ -36,7 +36,7 @@ const defaultContext = {
   logout: async () => {},
   verifyUser: async () => null,
   updateUser: async () => ({} as User),
-  verifyEmail: async () => ({} as AuthResponse),
+  verifyEmail: async () => ({} as VerifyEmailResponse),
   resendCode: async () => ({} as Result),
   setPassword: async () => ({} as Result),
   acceptTerms: async () => ({} as Result),
@@ -97,8 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const verifyEmail = async (data: VerifyEmailPayload) => {
     try {
       const response = await apiServer.post("/auth/verify-email", data);
-      setUser(response.data.user as User);
-      return response.data as AuthResponse;
+      return response.data as VerifyEmailResponse;
     } catch (error) {
       console.error("Error al verificar el email", error);
       throw error;
@@ -128,7 +127,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const acceptTerms = async () => {
     try {
       const response = await apiServer.post("/auth/accept-terms", { accepted: true });
-      setUser((prev) => (prev ? { ...prev, termsAccepted: true } : prev));
+      if (response.data.user) {
+        setUser(response.data.user as User);
+      }
       return response.data as Result;
     } catch (error) {
       console.error("Error al aceptar términos", error);

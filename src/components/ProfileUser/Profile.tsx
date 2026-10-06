@@ -66,12 +66,10 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
     { path: `/user/${user.id}`, title: "Publicaciones", number: posts.length },
     { path: `/user/${user.id}/following`, title: "Siguiendo", number: user.followingCount ?? 0 },
     { path: `/user/${user.id}/followers`, title: "Seguidores", number: user.followersCount ?? 0 },
-    // { path: `/user/${user.id}/me-gusta`, title: "Me gusta", number: 0 },
   ];
 
   const infonavs = [
     { name: "Publicaciones", path: `/user/${user.id}` },
-    { name: "Comentarios", path: `/user/${user.id}/comentarios` },
     ...(isOwn ? [{ name: "Guardados", path: `/user/${user.id}/guardados` }] : []),
     { name: "Me gusta", path: `/user/${user.id}/me-gusta` },
   ];

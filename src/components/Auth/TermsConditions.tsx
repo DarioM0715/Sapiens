@@ -1,10 +1,6 @@
-//ICONS
-import { BsGoogle } from "react-icons/bs";
-import { FaUserCircle } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-
 //HOOKS
 import { useAuthContext } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 //COMPONENTS
 import { ButtonAction } from "@/shared/ui/ButtonAction";
@@ -38,17 +34,8 @@ export const TermsConditions = ({ error, setError }: TermsConditionsProps) => {
 
     return (
         <div className="flex flex-col items-center justify-center gap-6 w-full">
-            <div className="flex flex-col items-center gap-3 text-center">
-                <FaUserCircle size={80} className="text-primary" />
-                <div>
-                    <h1 className="text-3xl font-bold text-primary dark:text-white">Regístrate</h1>
-                    <p className="mt-2 text-sm text-muted dark:text-gray-300">
-                        Crea tu cuenta para compartir artículos, seguir a otros usuarios y participar en debates.
-                    </p>
-                </div>
-            </div>
 
-            <section className="flex flex-col gap-4 w-full border-default bg-surface-2 rounded-2xl p-4 max-h-64 overflow-y-auto text-sm text-muted dark:text-gray-300 leading-relaxed">
+            <section className="flex flex-col gap-4 w-full border-default bg-surface-2 rounded-2xl p-4 overflow-y-auto text-sm text-muted dark:text-gray-300 leading-relaxed">
                 <h2 className="text-lg font-bold text-primary">Términos y condiciones</h2>
                 <p>Bienvenido/a a Sapiens. Al crear tu cuenta aceptas los siguientes términos:</p>
                 <ul className="list-disc pl-5 flex flex-col gap-2">
@@ -88,21 +75,13 @@ export const TermsConditions = ({ error, setError }: TermsConditionsProps) => {
             {error && <p className="w-full text-center text-sm text-red-500">{error}</p>}
 
             <div className="w-full">
-                <ButtonAction
-                    type="button"
-                    color="primary"
-                    className="w-full btn-primary"
-                    aria-label="Crear cuenta"
+                <ButtonAction type="button" color="primary" className="w-full btn-primary" aria-label="Crear cuenta"
+                    disabled={!termsChecked}
                     onClick={onTermsSubmit}
                 >
                     Crear cuenta
                 </ButtonAction>
             </div>
-
-            <ButtonAction type="button" color="primary" className="btn-primary flex items-center gap-4 w-full">
-                <BsGoogle size={24} />
-                Crear cuenta con Google
-            </ButtonAction>
         </div>
     );
 };
