@@ -13,7 +13,7 @@ import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-const Navs = ({ path, title, number }: { path: string; title: string; number: number }) => {
+const Navs = ({ path, title, number }: { path: string; title: string; number: number | string }) => {
   return (
     <Buttonav path={path} className="p-3 py-2 flex items-center gap-2 bg-surface border-default rounded-xl hover-surface-2">
       <span className="text-sm text-primary">{title}</span>
@@ -34,16 +34,35 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
 
   const { categoria } = useParams();
 
-  const { data: posts = [], isLoading } = usePosts(user.id);
-  const { data: replies = [], isLoading: repliesLoading } = useUserReplies(user.id);
-  const { data: savedPosts = [], isLoading: savedLoading } = useSavedPosts(isOwn);
-  const { data: likedPosts = [], isLoading: likedLoading } = useLikedPosts(user.id);
-
   const isGuardados = categoria === "guardados";
   const isMeGusta = categoria === "me-gusta";
   const isComentarios = categoria === "comentarios";
+
+  const postsQuery = usePosts(user.id, !isGuardados && !isMeGusta && !isComentarios);
+  const repliesQuery = useUserReplies(isComentarios ? user.id : undefined);
+  const savedQuery = useSavedPosts(isOwn && isGuardados);
+  const likedQuery = useLikedPosts(isMeGusta ? user.id : undefined);
+
+  const { data: posts = [] } = postsQuery;
+  const { data: replies = [] } = repliesQuery;
+  const { data: savedPosts = [] } = savedQuery;
+  const { data: likedPosts = [] } = likedQuery;
+
   const activePosts = isGuardados ? savedPosts : isMeGusta ? likedPosts : isComentarios ? replies : posts;
-  const activeLoading = isGuardados ? savedLoading : isMeGusta ? likedLoading : isComentarios ? repliesLoading : isLoading;
+  const activeLoading = isGuardados
+    ? savedQuery.isLoading
+    : isMeGusta
+      ? likedQuery.isLoading
+      : isComentarios
+        ? repliesQuery.isLoading
+        : postsQuery.isLoading;
+  const activeNext = isGuardados
+    ? savedQuery
+    : isMeGusta
+      ? likedQuery
+      : isComentarios
+        ? repliesQuery
+        : postsQuery;
 
   const followMutation = useFollowUser();
   const unfollowMutation = useUnfollowUser();
@@ -63,7 +82,11 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
   };
 
   const profilenavs = [
-    { path: `/user/${user.id}`, title: "Publicaciones", number: posts.length },
+    {
+      path: `/user/${user.id}`,
+      title: "Publicaciones",
+      number: postsQuery.hasNextPage ? "+" : posts.length,
+    },
     { path: `/user/${user.id}/following`, title: "Siguiendo", number: user.followingCount ?? 0 },
     { path: `/user/${user.id}/followers`, title: "Seguidores", number: user.followersCount ?? 0 },
   ];
@@ -153,7 +176,15 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
         </div>
       </div>
 
-      <ScrollCard posts={activePosts} navs={infonavs} isLoading={activeLoading} isEmpty={!activeLoading && activePosts.length === 0} />
+      <ScrollCard
+        posts={activePosts}
+        navs={infonavs}
+        isLoading={activeLoading}
+        isEmpty={!activeLoading && activePosts.length === 0}
+        hasNextPage={activeNext.hasNextPage}
+        isFetchingNextPage={activeNext.isFetchingNextPage}
+        onLoadMore={() => activeNext.fetchNextPage()}
+      />
     </section>
   );
 };

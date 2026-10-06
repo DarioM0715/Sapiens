@@ -19,7 +19,7 @@ export const AsidePost = () => {
   ];
 
   const { user: currentUser } = useAuthContext();
-  const { data: users = [], isLoading } = useUsers();
+  const { data: users = [], isLoading } = useUsers({ limit: 8 });
   const followMutation = useFollowUser();
   const unfollowMutation = useUnfollowUser();
 

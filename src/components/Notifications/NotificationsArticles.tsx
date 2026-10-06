@@ -1,9 +1,15 @@
 import { PostCard } from "../Cards/PostCard";
 import { AsidePost } from "../AsidePost";
 import { usePosts } from "@/hooks/useContent";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 const NotificationsArticles = () => {
-  const { data: posts = [], isLoading, isError } = usePosts();
+  const { data: posts = [], isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = usePosts();
+
+  const sentinelRef = useInfiniteScroll(() => fetchNextPage(), {
+    enabled: hasNextPage && !isLoading,
+    isLoading: isFetchingNextPage,
+  });
 
   return (
     <div className="flex flex-col justify-center lg:flex-row gap-8 w-full py-5 px-5 lg:px-10 xl:px-20">
@@ -24,6 +30,11 @@ const NotificationsArticles = () => {
           {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
+          {hasNextPage && (
+            <div ref={sentinelRef} className="py-6 text-center text-muted text-sm" aria-live="polite">
+              {isFetchingNextPage ? "Cargando más publicaciones..." : "Desplaza para cargar más"}
+            </div>
+          )}
         </div>
       </section>
 

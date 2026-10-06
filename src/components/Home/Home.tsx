@@ -11,12 +11,24 @@ const Home = () => {
   const { pathname } = useLocation();
   const isFollowingFeed = pathname.endsWith("/home/following");
 
-  const homeQuery = usePosts();
+  const homeQuery = usePosts(undefined, !isFollowingFeed);
   const followingQuery = useFollowingPosts(isFollowingFeed);
 
-  const { data: posts = [], isLoading, isError } = isFollowingFeed ? followingQuery : homeQuery;
+  const { data: posts = [], isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = isFollowingFeed
+    ? followingQuery
+    : homeQuery;
 
-  return <ScrollCard posts={posts} navs={navs} isLoading={isLoading} isEmpty={!isLoading && !isError && posts.length === 0} />;
+  return (
+    <ScrollCard
+      posts={posts}
+      navs={navs}
+      isLoading={isLoading}
+      isEmpty={!isLoading && !isError && posts.length === 0}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      onLoadMore={() => fetchNextPage()}
+    />
+  );
 };
 
 export default Home;

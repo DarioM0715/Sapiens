@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
 import Post from "../models/Post.js";
+import { decodeUserCursor, paginate, parseLimit, prismaCursorWhere } from "../utils/pagination.js";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -367,10 +368,20 @@ export const logout = (_req, res) => {
 
 export const getUsers = async (req, res) => {
   try {
-    const users = await prisma.user.findMany({
+    const limit = parseLimit(req.query.limit);
+    const cursor = req.query.cursor ? decodeUserCursor(req.query.cursor) : null;
+    if (req.query.cursor && !cursor) {
+      return res.status(400).json({ message: "Cursor inválido" });
+    }
+
+    const rows = await prisma.user.findMany({
+      where: prismaCursorWhere(cursor),
       select: selectUser,
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take: limit + 1,
     });
+
+    const { items, nextCursor, hasMore } = paginate(rows, limit);
 
     let followingIds = new Set();
     const token = req.cookies?.token;
@@ -388,7 +399,9 @@ export const getUsers = async (req, res) => {
     }
 
     return res.json({
-      users: users.map((user) => ({ ...user, isFollowing: followingIds.has(user.id) })),
+      users: items.map((user) => ({ ...user, isFollowing: followingIds.has(user.id) })),
+      nextCursor,
+      hasMore,
     });
   } catch (error) {
     console.error("Error al listar usuarios:", error);
