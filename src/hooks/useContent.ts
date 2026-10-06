@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchPosts,
   fetchUserReplies,
@@ -14,44 +14,45 @@ import {
   addReply,
 } from "@/services/content";
 import type { CreatePostPayload } from "@/services/content";
+import type { Post } from "@/types/post";
 
-export const usePosts = (userId?: string | number) => {
-  return useQuery({
-    queryKey: ["posts", userId ?? null],
-    queryFn: () => fetchPosts(userId),
-  });
-};
+type PostsPageResponse = { posts: Post[]; nextCursor: string | null; hasMore: boolean };
 
-export const useUserReplies = (userId?: string | number) => {
-  return useQuery({
-    queryKey: ["replies", "user", userId],
-    queryFn: () => fetchUserReplies(userId as string | number),
-    enabled: !!userId,
-  });
-};
+const flatten = (query: { data?: { pages: PostsPageResponse[] } }): Post[] =>
+  query.data?.pages.flatMap((page) => page.posts) ?? [];
 
-export const useFollowingPosts = (enabled = true) => {
-  return useQuery({
-    queryKey: ["posts", "following"],
-    queryFn: () => fetchFollowingPosts(),
+const usePostList = (
+  key: readonly unknown[],
+  fetchPage: (params: { cursor?: string }) => Promise<PostsPageResponse>,
+  enabled = true
+) => {
+  const query = useInfiniteQuery({
+    queryKey: key,
+    queryFn: ({ pageParam }) => fetchPage({ cursor: pageParam as string | undefined }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     enabled,
   });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- data se reemplaza por la version plana
+  const { data, ...rest } = query;
+  return { ...rest, data: flatten(query) };
 };
 
-export const useSavedPosts = (enabled = true) => {
-  return useQuery({
-    queryKey: ["posts", "saved"],
-    queryFn: () => fetchSavedPosts(),
-    enabled,
-  });
-};
+export const usePosts = (userId?: string | number, enabled = true) =>
+  usePostList(["posts", userId ?? null], (params) => fetchPosts({ ...params, userId }), enabled);
 
-export const useLikedPosts = (userId?: string | number) => {
-  return useQuery({
-    queryKey: ["posts", "liked", userId ?? null],
-    queryFn: () => fetchLikedPosts(userId),
-  });
-};
+export const useUserReplies = (userId?: string | number) =>
+  usePostList(["replies", "user", userId], (params) => fetchUserReplies(userId as string | number, params), !!userId);
+
+export const useFollowingPosts = (enabled = true) =>
+  usePostList(["posts", "following"], (params) => fetchFollowingPosts(params), enabled);
+
+export const useSavedPosts = (enabled = true) =>
+  usePostList(["posts", "saved"], (params) => fetchSavedPosts(params), enabled);
+
+export const useLikedPosts = (userId?: string | number) =>
+  usePostList(["posts", "liked", userId ?? null], (params) => fetchLikedPosts(userId, params));
 
 export const usePost = (id?: string | number) => {
   return useQuery({
@@ -97,13 +98,8 @@ export const useSavePost = () => {
   });
 };
 
-export const useReplies = (postId?: string | number) => {
-  return useQuery({
-    queryKey: ["replies", postId],
-    queryFn: () => fetchReplies(postId as string | number),
-    enabled: !!postId,
-  });
-};
+export const useReplies = (postId?: string | number) =>
+  usePostList(["replies", postId], (params) => fetchReplies(postId as string | number, params), !!postId);
 
 export const useAddReply = (postId?: string | number) => {
   const queryClient = useQueryClient();
@@ -116,3 +112,4 @@ export const useAddReply = (postId?: string | number) => {
     },
   });
 };
+

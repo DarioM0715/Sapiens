@@ -7,9 +7,19 @@ const Community = () => {
     { name: "Recientes", path: "/community" },
   ];
 
-  const { data: posts = [], isLoading, isError } = usePosts();
+  const { data: posts = [], isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = usePosts();
 
-  return <ScrollCard posts={posts} navs={navs} isLoading={isLoading} isEmpty={!isLoading && !isError && posts.length === 0} />;
+  return (
+    <ScrollCard
+      posts={posts}
+      navs={navs}
+      isLoading={isLoading}
+      isEmpty={!isLoading && !isError && posts.length === 0}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      onLoadMore={() => fetchNextPage()}
+    />
+  );
 };
 
 export default Community;

@@ -37,6 +37,7 @@ model User {
   following Follow[] @relation("UserFollowing")
   followers Follow[] @relation("UserFollowers")
 
+  @@index([createdAt, id])
   @@map("users")
 }
 

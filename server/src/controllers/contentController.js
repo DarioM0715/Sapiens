@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { PrismaClient } from "@prisma/client";
 import Post from "../models/Post.js";
+import { decodePostCursor, mongoCursorFilter, paginate, parseLimit } from "../utils/pagination.js";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -90,6 +91,23 @@ const isValidId = (id, res) => {
   return true;
 };
 
+const findPostPage = async (req, res, filter, direction) => {
+  const limit = parseLimit(req.query.limit);
+  const cursor = req.query.cursor ? decodePostCursor(req.query.cursor) : null;
+
+  if (req.query.cursor && !cursor) {
+    res.status(400).json({ message: "Cursor inválido" });
+    return null;
+  }
+
+  const docs = await Post.find({ $and: [filter, mongoCursorFilter(cursor, direction)] })
+    .sort({ createdAt: direction, _id: direction })
+    .limit(limit + 1)
+    .lean();
+
+  return paginate(docs, limit, direction);
+};
+
 export const listPosts = async (req, res) => {
   try {
     const { userId, replies } = req.query;
@@ -100,11 +118,17 @@ export const listPosts = async (req, res) => {
         }
       : { parentId: null };
 
-    const posts = await Post.find(filter).sort({ createdAt: -1 }).lean();
-    const countMap = await attachReplyCounts(posts);
+    const page = await findPostPage(req, res, filter, -1);
+    if (!page) return;
+
+    const countMap = await attachReplyCounts(page.items);
     const currentUserId = getRequestUserId(req);
 
-    return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
+    return res.json({
+      posts: page.items.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)),
+      nextCursor: page.nextCursor,
+      hasMore: page.hasMore,
+    });
   } catch (error) {
     console.error("Error al listar posts:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -141,14 +165,19 @@ export const listFollowingPosts = async (req, res) => {
     const followingIds = follows.map((f) => f.followingId);
 
     if (followingIds.length === 0) {
-      return res.json({ posts: [] });
+      return res.json({ posts: [], nextCursor: null, hasMore: false });
     }
 
-    const posts = await Post.find({ "user.userId": { $in: followingIds }, parentId: null }).sort({ createdAt: -1 }).lean();
+    const page = await findPostPage(req, res, { "user.userId": { $in: followingIds }, parentId: null }, -1);
+    if (!page) return;
 
-    const countMap = await attachReplyCounts(posts);
+    const countMap = await attachReplyCounts(page.items);
 
-    return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
+    return res.json({
+      posts: page.items.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)),
+      nextCursor: page.nextCursor,
+      hasMore: page.hasMore,
+    });
   } catch (error) {
     console.error("Error al listar posts de seguidos:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -165,33 +194,45 @@ const attachReplyCounts = async (posts) => {
   return Object.fromEntries(counts.map((c) => [c._id.toString(), c.count]));
 };
 
-// Devuelve las publicaciones guardadas por el usuario actual (solo raíces)
+// PUBLICACIONES GUARDADAS
 export const listSavedPosts = async (req, res) => {
   try {
     const currentUserId = String(req.user.id);
 
-    const posts = await Post.find({ savedBy: currentUserId, parentId: null }).sort({ createdAt: -1 }).lean();
-    const countMap = await attachReplyCounts(posts);
+    const page = await findPostPage(req, res, { savedBy: currentUserId, parentId: null }, -1);
+    if (!page) return;
 
-    return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
+    const countMap = await attachReplyCounts(page.items);
+
+    return res.json({
+      posts: page.items.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)),
+      nextCursor: page.nextCursor,
+      hasMore: page.hasMore,
+    });
   } catch (error) {
     console.error("Error al listar publicaciones guardadas:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 };
 
-// Devuelve las publicaciones a las que el usuario indicado (o el actual) les dio "me gusta" (solo raíces)
+// PUBLICACIONES QUE GUSTAN
 export const listLikedPosts = async (req, res) => {
   try {
     const { userId } = req.query;
     const likedUserId = String(userId ?? getRequestUserId(req) ?? "");
-    if (!likedUserId) return res.json({ posts: [] });
+    if (!likedUserId) return res.json({ posts: [], nextCursor: null, hasMore: false });
 
-    const posts = await Post.find({ likedBy: likedUserId, parentId: null }).sort({ createdAt: -1 }).lean();
-    const countMap = await attachReplyCounts(posts);
+    const page = await findPostPage(req, res, { likedBy: likedUserId, parentId: null }, -1);
+    if (!page) return;
+
+    const countMap = await attachReplyCounts(page.items);
     const currentUserId = getRequestUserId(req);
 
-    return res.json({ posts: posts.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)) });
+    return res.json({
+      posts: page.items.map((p) => serializePost(p, countMap[p._id.toString()] ?? 0, currentUserId)),
+      nextCursor: page.nextCursor,
+      hasMore: page.hasMore,
+    });
   } catch (error) {
     console.error("Error al listar publicaciones con me gusta:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -323,9 +364,15 @@ export const listReplies = async (req, res) => {
     if (!isValidId(id, res)) return;
 
     const currentUserId = getRequestUserId(req);
-    const replies = await Post.find({ parentId: id }).sort({ createdAt: 1 }).lean();
+    // Orden ascendente: el hilo se lee del comentario más antiguo al más reciente.
+    const page = await findPostPage(req, res, { parentId: id }, 1);
+    if (!page) return;
 
-    return res.json({ posts: replies.map((r) => serializePost(r, 0, currentUserId)) });
+    return res.json({
+      posts: page.items.map((r) => serializePost(r, 0, currentUserId)),
+      nextCursor: page.nextCursor,
+      hasMore: page.hasMore,
+    });
   } catch (error) {
     console.error("Error al listar respuestas:", error);
     return res.status(500).json({ message: "Error interno del servidor" });

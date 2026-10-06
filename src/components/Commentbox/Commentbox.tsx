@@ -6,6 +6,7 @@ import { PostCard } from "../Cards/PostCard";
 import { Avatar } from "../Avatar";
 import { useAuthContext } from "@/context/AuthContext";
 import { usePost, useReplies, useAddReply, useLikePost, useDislikePost } from "@/hooks/useContent";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { timeAgo } from "@/shared/utils/utilsfunctions";
 import type { Post } from "@/types/post";
 
@@ -62,8 +63,13 @@ const Commentbox: React.FC = () => {
   const [text, setText] = useState("");
 
   const { data: post, isLoading: postLoading } = usePost(id);
-  const { data: replies = [], isLoading: repliesLoading } = useReplies(id);
+  const { data: replies = [], isLoading: repliesLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useReplies(id);
   const addReply = useAddReply(id);
+
+  const repliesSentinelRef = useInfiniteScroll(() => fetchNextPage(), {
+    enabled: hasNextPage && !repliesLoading,
+    isLoading: isFetchingNextPage,
+  });
 
   const handleSubmit = () => {
     if (!text.trim() || addReply.isPending) return;
@@ -182,6 +188,14 @@ const Commentbox: React.FC = () => {
               {replies.map((reply) => (
                 <ReplyRow key={reply.id} reply={reply} />
               ))}
+              {hasNextPage && (
+                <div ref={repliesSentinelRef} className="py-4 text-center text-muted text-sm" aria-live="polite">
+                  {isFetchingNextPage ? "Cargando respuestas..." : "Desplaza para cargar más"}
+                </div>
+              )}
+              {!hasNextPage && replies.length > 0 && (
+                <p className="py-2 text-center text-muted text-xs">No hay más respuestas</p>
+              )}
             </div>
           </div>
         </div>

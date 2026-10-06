@@ -30,6 +30,13 @@ const postSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Índices compuestos para la paginación por cursor: cada listado filtra y ordena por
+// (createdAt, _id), así que el prefijo del índice debe ser el filtro de la consulta.
+postSchema.index({ parentId: 1, createdAt: -1, _id: -1 });
+postSchema.index({ "user.userId": 1, parentId: 1, createdAt: -1, _id: -1 });
+postSchema.index({ savedBy: 1, parentId: 1, createdAt: -1, _id: -1 });
+postSchema.index({ likedBy: 1, parentId: 1, createdAt: -1, _id: -1 });
+
 const Post = mongoose.model("Post", postSchema);
 
 export default Post;
