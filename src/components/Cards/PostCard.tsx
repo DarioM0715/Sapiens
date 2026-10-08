@@ -2,7 +2,7 @@
 import { timeAgo } from "@/shared/utils/utilsfunctions";
 import { MoreOptionsDesktop } from "../Post/MoreOptionsDesktop";
 import { useNavigate } from "react-router-dom";
-import { Stats } from "../Post/Stats";
+import { InteractButton, Stats } from "../Post/Stats";
 import { Avatar } from "../Avatar";
 import { useSavePost } from "@/hooks/useContent";
 
@@ -30,7 +30,7 @@ export const PostCard = ({ post, className }: { post: Post, className?: string }
     navigate(path);
   };
 
-  const { id, title, description, time, categories, user, institution, type } = post;
+  const { id, title, description, time, categories, user, institution, type, hasSaved } = post;
   const { name } = user;
 
   const options: Option[] = [
@@ -72,7 +72,16 @@ export const PostCard = ({ post, className }: { post: Post, className?: string }
             </div>
           </div>
 
-        <MoreOptionsDesktop options={options} onSelect={handleSelect} />
+          <div className="flex items-center gap-2">
+            <InteractButton
+              Icon={Bookmark}
+              active={hasSaved}
+              activeClass="text-blue-500"
+              onClick={() => saveMutation.mutate(id)}
+            />
+            <MoreOptionsDesktop options={options} onSelect={handleSelect} />
+          </div>
+
       </div>
 
       {/* BODY (clicable) */}

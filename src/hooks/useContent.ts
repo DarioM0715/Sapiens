@@ -42,8 +42,8 @@ const usePostList = (
 export const usePosts = (userId?: string | number, enabled = true) =>
   usePostList(["posts", userId ?? null], (params) => fetchPosts({ ...params, userId }), enabled);
 
-export const useUserReplies = (userId?: string | number) =>
-  usePostList(["replies", "user", userId], (params) => fetchUserReplies(userId as string | number, params), !!userId);
+// export const useUserReplies = (userId?: string | number) =>
+//   usePostList(["replies", "user", userId], (params) => fetchUserReplies(userId as string | number, params), !!userId);
 
 export const useFollowingPosts = (enabled = true) =>
   usePostList(["posts", "following"], (params) => fetchFollowingPosts(params), enabled);
