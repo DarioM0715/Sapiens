@@ -19,7 +19,7 @@ type InteractButtonProps = {
   activeClass?: string;
 };
 
-const InteractButton = ({ Icon, value, onClick, disabled, active, activeClass }: InteractButtonProps) => {
+export const InteractButton = ({ Icon, value, onClick, disabled, active, activeClass }: InteractButtonProps) => {
   return (
     <button
       type="button"
@@ -33,7 +33,8 @@ const InteractButton = ({ Icon, value, onClick, disabled, active, activeClass }:
         fill={active ? "currentColor" : "none"}
         className={`transform transition-all duration-150 hover:scale-125 ${active ? activeClass : "text-muted hover:stroke-blue-400"}`}
       />
-      <p className="text-sm">{value ?? 0}</p>
+      {value && <p className="text-sm">{value ?? 0}</p>}
+      {/* <p className="text-sm">{value ?? 0}</p> */}
     </button>
   );
 };

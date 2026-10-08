@@ -1,9 +1,10 @@
 import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { Buttonav } from "@/shared/ui/Buttonnav";
 import { ScrollCard } from "../Cards/ScrollCard";
-import { usePosts, useUserReplies, useSavedPosts, useLikedPosts } from "@/hooks/useContent";
+import { usePosts, useSavedPosts, useLikedPosts } from "@/hooks/useContent";
 import { useFollowUser, useUnfollowUser } from "@/hooks/useFollows";
 import { useImageContrast } from "@/hooks/useImageContrast";
+import { avatarOrDefault, backgroundOrDefault } from "@/shared/utils/userMedia";
 
 // INTERACES
 import type { User } from "@/types/users";
@@ -36,32 +37,25 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
 
   const isGuardados = categoria === "guardados";
   const isMeGusta = categoria === "me-gusta";
-  const isComentarios = categoria === "comentarios";
 
-  const postsQuery = usePosts(user.id, !isGuardados && !isMeGusta && !isComentarios);
-  const repliesQuery = useUserReplies(isComentarios ? user.id : undefined);
+  const postsQuery = usePosts(user.id, !isGuardados && !isMeGusta);
   const savedQuery = useSavedPosts(isOwn && isGuardados);
   const likedQuery = useLikedPosts(isMeGusta ? user.id : undefined);
 
   const { data: posts = [] } = postsQuery;
-  const { data: replies = [] } = repliesQuery;
   const { data: savedPosts = [] } = savedQuery;
   const { data: likedPosts = [] } = likedQuery;
 
-  const activePosts = isGuardados ? savedPosts : isMeGusta ? likedPosts : isComentarios ? replies : posts;
+  const activePosts = isGuardados ? savedPosts : isMeGusta ? likedPosts : posts;
   const activeLoading = isGuardados
     ? savedQuery.isLoading
     : isMeGusta
       ? likedQuery.isLoading
-      : isComentarios
-        ? repliesQuery.isLoading
         : postsQuery.isLoading;
   const activeNext = isGuardados
     ? savedQuery
     : isMeGusta
       ? likedQuery
-      : isComentarios
-        ? repliesQuery
         : postsQuery;
 
   const followMutation = useFollowUser();
@@ -109,12 +103,12 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
       <div className="relative">
         <div className={isDesktop ? "ml-0" : ""}>
           <div className="w-full overflow-hidden">
-            <img src={background} alt={`${name} background`} className="w-full h-44 md:h-56 object-cover" />
+            <img src={backgroundOrDefault(background)} alt={`${name} background`} className="w-full h-44 md:h-56 object-cover" />
           </div>
 
           <div className="relative">
             <div className={"absolute flex flex-row left-11 transform -translate-y-1/2 -top-8 gap-10"}>
-              <img src={avatar} alt={`${name} avatar`} className="w-32 h-32 rounded-full object-cover" />
+              <img src={avatarOrDefault(avatar)} alt={`${name} avatar`} className="w-32 h-32 rounded-full object-cover" />
 
               <div className="md:mt-8 mb-4 pl-0">
                 <h2

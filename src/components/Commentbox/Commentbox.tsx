@@ -91,7 +91,7 @@ const Commentbox: React.FC = () => {
 
   return (
     <div className={`bg-surface text-primary min-h-[60vh] py-8 ${isDesktop ? "px-10" : "px-4"}`} aria-label="Documento y comentarios">
-      <div className={isDesktop ? "max-w-[1200px] mx-0 grid grid-cols-[1fr_320px] gap-8 items-start" : "max-w-3xl mx-auto"}>
+      <div className={isDesktop ? "max-w-[1800px] mx-0 grid grid-cols-[1fr_320px] gap-8 items-start" : "max-w-3xl mx-auto"}>
         <div>
           <PostCard post={post} className="border rounded-md border-[var(--color-border)]" />
 

@@ -3,6 +3,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import type { User } from "@/types/users";
 import { Camera, Upload, Save, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { avatarOrDefault, backgroundOrDefault } from "@/shared/utils/userMedia";
 
 const EditProfile: React.FC = () => {
   const { user, updateUser } = useAuthContext();
@@ -18,8 +19,8 @@ const EditProfile: React.FC = () => {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const backgroundInputRef = useRef<HTMLInputElement>(null);
 
-  const avatarPreview = avatar || "/images/avatar-placeholder.png";
-  const backgroundPreview = background;
+  const avatarPreview = avatarOrDefault(avatar);
+  const backgroundPreview = backgroundOrDefault(background);
   const id = user?.id ?? "";
 
   const navigate = useNavigate();
@@ -82,13 +83,7 @@ const EditProfile: React.FC = () => {
         <div className="bg-surface-2 border-default rounded-2xl shadow-md p-6 sm:p-8 flex flex-col gap-6">
           {/* Portada */}
           <div className="relative">
-            {backgroundPreview ? (
-              <img src={backgroundPreview} alt="Portada" className="w-full h-32 md:h-40 object-cover rounded-xl" />
-            ) : (
-              <div className="w-full h-32 md:h-40 rounded-xl bg-surface border border-[var(--color-border)] flex items-center justify-center text-muted text-sm">
-                Sin portada
-              </div>
-            )}
+            <img src={backgroundPreview} alt="Portada" className="w-full h-32 md:h-40 object-cover rounded-xl" />
             <button
               type="button"
               onClick={() => backgroundInputRef.current?.click()}
