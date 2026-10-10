@@ -1,15 +1,17 @@
+// HOOKS
 import { timeAgo } from "@/shared/utils/utilsfunctions";
-import { MoreOptions } from "../Post/MoreOptions";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Stats } from "../Post/Stats";
+import { MoreOptionsDesktop } from "../Post/MoreOptionsDesktop";
+import { useNavigate } from "react-router-dom";
+import { InteractButton, Stats } from "../Post/Stats";
 import { Avatar } from "../Avatar";
+import { useSavePost } from "@/hooks/useContent";
 
-//INTERFACES
-import type { Post } from "@/types/types";
-import type { Option } from "@/types/types";
+//TYPES
+import type { Post } from "@/types/post";
+import type { Option } from "@/types/system";
 
 // ICONS
-import { Bookmark, Share2, User } from "lucide-react";
+import { Bookmark, User } from "lucide-react";
 
 const CategoryBubble = ({ category }: { category: string }) => {
   return (
@@ -20,36 +22,34 @@ const CategoryBubble = ({ category }: { category: string }) => {
   );
 };
 
-export const PostCard = ({ post }: { post: Post }) => {
+export const PostCard = ({ post, className }: { post: Post, className?: string }) => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const saveMutation = useSavePost();
 
   const handleNavigate = (path: string) => {
     navigate(path);
   };
 
-  const { id, title, description, time, categories, user, institution, type } = post;
+  const { id, title, description, time, categories, user, institution, type, hasSaved } = post;
   const { name } = user;
 
   const options: Option[] = [
-    { id: 1, label: "Guardar", Icon: Bookmark },
-    { id: 2, label: "Compartir", Icon: Share2 },
-    { id: 3, label: "Ver perfil", Icon: User },
-    // { id: 3, label: "Eliminar publicación", Icon: Trash },
+    { id: 5, label: post.hasSaved ? "Guardado" : "Guardar", Icon: Bookmark },
+    { id: 7, label: "Ver perfil", Icon: User },
   ];
 
   const handleSelect = (option: Option) => {
-    console.log(option);
+    if (option.id === 5) {
+      saveMutation.mutate(id);
+    } else if (option.id === 7) {
+      handleNavigate(`/user/${user.id}`);
+    }
   };
 
-  const containerClasses =
-    pathname === "/detalles/:id" ? "flex flex-col py-6 px-4 gap-3 border-default rounded-lg bg-surface" : "flex flex-col py-6 px-4 gap-3 border-b border-gray-200";
-
   return (
-    <article id={String(id)} className={containerClasses} aria-labelledby={`post-title-${id}`}>
+    <article id={String(id)} className={`flex flex-col gap-3 p-4 md:p-6 ${className}`} aria-labelledby={`post-title-${id}`}>
       {/* HEADER */}
       <div className="flex text-primary justify-between items-center">
-        <NavLink to="/otroperfil/:4">
           <div className="flex items-center gap-3">
             <Avatar user={user} size={12} />
 
@@ -71,13 +71,21 @@ export const PostCard = ({ post }: { post: Post }) => {
               </div>
             </div>
           </div>
-        </NavLink>
 
-        <MoreOptions options={options} onSelect={handleSelect} />
+          <div className="flex items-center gap-2">
+            <InteractButton
+              Icon={Bookmark}
+              active={hasSaved}
+              activeClass="text-blue-500"
+              onClick={() => saveMutation.mutate(id)}
+            />
+            <MoreOptionsDesktop options={options} onSelect={handleSelect} />
+          </div>
+
       </div>
 
       {/* BODY (clicable) */}
-      <div onClick={() => handleNavigate(`/detalles/${id}`)} role="button" className="flex flex-col gap-2 text-primary cursor-pointer">
+      <div onClick={() => handleNavigate(`/post/${id}`)} role="button" className="flex flex-col gap-2 text-primary cursor-pointer">
         <h3 className="font-bold text-lg flex items-center gap-2" id={`post-title-click-${id}`}>
           {title}
         </h3>
@@ -88,7 +96,7 @@ export const PostCard = ({ post }: { post: Post }) => {
         <div className="flex items-center gap-2">{(categories?.length ?? 0) > 0 && categories!.map((category) => <CategoryBubble key={category} category={category} />)}</div>
       </div>
 
-      <Stats stats={post} />
+      <Stats post={post} />
     </article>
   );
 };

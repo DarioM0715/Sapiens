@@ -1,74 +1,166 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { apiServer } from "@/services/apiServer";
-import profileimage from "@/assets/images/048617ceb68b40a45847078db347ba59.png";
-import backgroundimage from "@/assets/images/image.png";
+import type { User } from "@/types/users";
+import type { LOGIN_FORM, PASSWORD_FORM, REGISTER_FORM } from "@/types/formstypes";
+
+export type SignupPayload = REGISTER_FORM & { sex: User["sex"] };
+export type VerifyEmailPayload = { email: string; code: string };
+export type ResendCodePayload = { email: string };
+export type PasswordPayload = Pick<PASSWORD_FORM, "password">;
+
+type SignupResponse = { message?: string; needsEmailVerification?: boolean; email?: string };
+type VerifyEmailResponse = { message?: string; email?: string; nextStep?: number };
+type Result = { message?: string; nextStep?: number; user?: User };
 
 interface AuthContextProps {
-  user: any;
-  setUser: any;
-  login: any;
-  singup: any;
-  logout: any;
-  verifyUser: any;
+  user: User | null;
+  setUser: Dispatch<SetStateAction<User | null>>;
+  login: (data: LOGIN_FORM) => Promise<User>;
+  singup: (data: SignupPayload) => Promise<SignupResponse>;
+  logout: () => Promise<void>;
+  verifyUser: () => Promise<User | null>;
+  updateUser: (data: Partial<User>) => Promise<User>;
+  verifyEmail: (data: VerifyEmailPayload) => Promise<VerifyEmailResponse>;
+  resendCode: (data: ResendCodePayload) => Promise<Result>;
+  setPassword: (data: PasswordPayload) => Promise<Result>;
+  acceptTerms: () => Promise<Result>;
+  isLoadingAuth: boolean;
 }
 
-const AuthContext = createContext<AuthContextProps>({
+const defaultContext = {
   user: null,
   setUser: () => {},
-  login: () => {},
-  singup: () => {},
-  logout: () => {},
-  verifyUser: () => {},
-});
+  login: async () => ({} as User),
+  singup: async () => ({} as SignupResponse),
+  logout: async () => {},
+  verifyUser: async () => null,
+  updateUser: async () => ({} as User),
+  verifyEmail: async () => ({} as VerifyEmailResponse),
+  resendCode: async () => ({} as Result),
+  setPassword: async () => ({} as Result),
+  acceptTerms: async () => ({} as Result),
+  isLoadingAuth: true,
+} as AuthContextProps;
+
+const AuthContext = createContext<AuthContextProps>(defaultContext);
 
 export const useAuthContext = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState({
-    id: 1,
-    name: "Dario Martinez",
-    email: "dario@gmail.com",
-    password: "123456",
-    avatar: profileimage,
-    background: backgroundimage,
-    note: "Este es mi perfil",
-    theme: "light",
-  });
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const queryClient = useQueryClient();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
-  const login = async (data: any) => {
+  const login = async (data: LOGIN_FORM) => {
     try {
       const response = await apiServer.post("/auth/login", data);
-      setUser(response.data);
+      setUser(response.data.user as User);
+      return response.data.user as User;
     } catch (error) {
-      console.log("Error al login");
+      console.error("Error al login", error);
+      throw error;
     }
   };
 
-  const singup = async (data: any) => {
+  const singup = async (data: SignupPayload) => {
     try {
       const response = await apiServer.post("/auth/signup", data);
-      setUser(response.data);
+      return response.data as SignupResponse;
     } catch (error) {
-      console.log("Error al signup");
+      console.error("Error al signup", error);
+      throw error;
     }
   };
 
   const logout = async () => {
     try {
       await apiServer.post("/auth/logout");
-      // setUser(null);
+      setUser(null);
     } catch (error) {
-      console.log("Error al logout");
+      console.error("Error al logout", error);
+      setUser(null);
     }
   };
 
   const verifyUser = async () => {
     try {
-      await apiServer.get("/auth/verify");
+      const response = await apiServer.get("/auth/verify");
+      setUser(response.data.user as User);
+      return response.data.user as User;
     } catch (error) {
-      console.log("Error al verificar usuario");
+      console.error("Error al verificar usuario", error);
+      setUser(null);
+      return null;
     }
   };
 
-  return <AuthContext.Provider value={{ user, setUser, login, singup, logout, verifyUser }}>{children}</AuthContext.Provider>;
+  const verifyEmail = async (data: VerifyEmailPayload) => {
+    try {
+      const response = await apiServer.post("/auth/verify-email", data);
+      return response.data as VerifyEmailResponse;
+    } catch (error) {
+      console.error("Error al verificar el email", error);
+      throw error;
+    }
+  };
+
+  const resendCode = async (data: ResendCodePayload) => {
+    try {
+      const response = await apiServer.post("/auth/resend-code", data);
+      return response.data as Result;
+    } catch (error) {
+      console.error("Error al reenviar el código", error);
+      throw error;
+    }
+  };
+
+  const setPassword = async (data: PasswordPayload) => {
+    try {
+      const response = await apiServer.post("/auth/set-password", data);
+      return response.data as Result;
+    } catch (error) {
+      console.error("Error al configurar la contraseña", error);
+      throw error;
+    }
+  };
+
+  const acceptTerms = async () => {
+    try {
+      const response = await apiServer.post("/auth/accept-terms", { accepted: true });
+      if (response.data.user) {
+        setUser(response.data.user as User);
+      }
+      return response.data as Result;
+    } catch (error) {
+      console.error("Error al aceptar términos", error);
+      throw error;
+    }
+  };
+
+  const updateUser = async (data: Partial<User>) => {
+    try {
+      const response = await apiServer.put("/auth/users/me", data);
+      setUser(response.data.user as User);
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      return response.data.user as User;
+    } catch (error) {
+      console.error("Error al actualizar usuario", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    verifyUser().finally(() => setIsLoadingAuth(false));
+  }, []);
+
+  return (
+    <AuthContext.Provider
+      value={{ user, setUser, login, singup, logout, verifyUser, updateUser, verifyEmail, resendCode, setPassword, acceptTerms, isLoadingAuth }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };

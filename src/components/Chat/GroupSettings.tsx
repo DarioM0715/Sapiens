@@ -1,4 +1,5 @@
 import { useState } from "react";
+import image from "@/assets/images/20260328_032700.jpg"
 
 const GroupSettings = () => {
   const participants = [
@@ -6,21 +7,21 @@ const GroupSettings = () => {
       id: "1",
       name: "Carlos Pérez",
       email: "carlos@ejemplo.com",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+      avatar: image,
       role: "administrador",
     },
     {
       id: "2",
       name: "María López",
       email: "maria@ejemplo.com",
-      avatar: "https://randomuser.me/api/portraits/women/45.jpg",
+      avatar: image,
       role: "miembro",
     },
     {
       id: "3",
       name: "Juan Torres",
       email: "juan@ejemplo.com",
-      avatar: "https://randomuser.me/api/portraits/men/18.jpg",
+      avatar: image,
       role: "miembro",
     },
   ];

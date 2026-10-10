@@ -207,7 +207,7 @@ const ChangePassword = () => {
                 setServerError(null);
                 setSuccessMsg(null);
               }}
-              className="px-3 py-2 rounded-md text-sm bg-surface text-primary border border-[var(--color-border)] hover:bg-surface-2 transition"
+              className="px-3 py-2 rounded-md text-sm bg-surface text-primary border border-[var(--color-border)] hover-surface-2 transition"
             >
               Limpiar
             </button>

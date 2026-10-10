@@ -1,7 +1,7 @@
-import type { User } from "@/types/types";
-import type { Option } from "@/types/types";
+import type { User } from "@/types/users";
+import type { Option } from "@/types/system";
 import { useLocation } from "react-router-dom";
-import { MoreOptions } from "../Post/MoreOptions";
+import { MoreOptionsDesktop } from "../Post/MoreOptionsDesktop";
 
 //ICONS
 import { MessageSquare, User as UserIcon, UserX, Flag, UserMinus, UserPlus } from "lucide-react";
@@ -23,11 +23,11 @@ export const ListUser = ({ listuser }: { listuser: User[] }) => {
     { id: 6, label: "Reportar", Icon: Flag },
   ];
 
-  if (pathname !== "/perfil/siguiendo") {
+  if (pathname !== "/user/following") {
     options.splice(1, 1);
   }
 
-  if (pathname !== "/perfil/seguidores") {
+  if (pathname !== "//user/followers") {
     options.splice(2, 1);
   }
 
@@ -55,7 +55,7 @@ export const ListUser = ({ listuser }: { listuser: User[] }) => {
               </div>
             </div>
 
-            <MoreOptions options={options} onSelect={handleSelect} />
+            <MoreOptionsDesktop options={options} onSelect={handleSelect} />
           </div>
         );
       })}

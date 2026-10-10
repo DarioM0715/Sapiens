@@ -172,7 +172,7 @@ const CreateGroup: React.FC = () => {
               setParticipants([]);
               setNewUser("");
             }}
-            className="px-4 py-2 rounded-md border border-[var(--color-border)] bg-surface text-primary hover:bg-surface-2 transition"
+            className="px-4 py-2 rounded-md border border-[var(--color-border)] bg-surface text-primary hover-surface-2 transition"
             aria-label="Descartar cambios"
           >
             Descartar

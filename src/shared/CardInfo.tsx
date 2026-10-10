@@ -1,4 +1,3 @@
-import type { Product } from "@/types/types";
 import { ArrowRight } from "lucide-react";
 import { FaBookmark } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +29,7 @@ export const CardInfo = ({ product }: Props) => {
             <span className="text-gray-600"> 7 variantes</span>
           </div>
 
-          <button onClick={handleNavigate} className="flex items-center justify-center bg-primary cursor-pointer rounded-full p-2 ">
+          <button title="nav" onClick={handleNavigate} className="flex items-center justify-center bg-primary cursor-pointer rounded-full p-2 ">
             <ArrowRight size={24} />
           </button>
         </div>

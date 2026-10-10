@@ -3,9 +3,11 @@ import { lazy } from "react";
 
 //COMPONENTS
 import Layout from "@/components/Layout";
+import AuthGuard from "@/context/AuthGuard";
 
 // MAIN
 const Home = lazy(() => import("@/components/Home/Home"));
+const Community = lazy(() => import("@/components/Community/Community"));
 
 // POST
 const CreateArticle = lazy(() => import("@/components/Post/CreateArticle"));
@@ -33,10 +35,8 @@ const Profile = lazy(() => import("@/components/ProfileUser/PageProfile"));
 const EditProfile = lazy(() => import("@/components/ProfileUser/EditProfile"));
 const FollowersList = lazy(() => import("@/components/ProfileUser/FollowersList"));
 const FollowingList = lazy(() => import("@/components/ProfileUser/FollowingList"));
-const OtherProfile = lazy(() => import("@/components/ProfileUser/OtherProfile"));
 
 //CHAT
-// const Chat = lazy(() => import("@/components/Chat/Chat"));
 const CreateGroup = lazy(() => import("@/components/Chat/CreateGroup"));
 const GroupSettings = lazy(() => import("@/components/Chat/GroupSettings"));
 
@@ -48,55 +48,48 @@ const NotFound = lazy(() => import("@/shared/NotFound"));
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/inicio" replace />,
+    element: <Navigate to="/home" replace />,
   },
 
   {
     element: <Layout />,
     children: [
-      //HOME
-      { path: "/:categoria", element: <Home /> },
+      { element: <AuthGuard />, children: [
+        { path: "/home", element: <Home /> },
+        { path: "/home/following", element: <Home/>},
+        // { path: "/community", element: <Community/>},
 
-      //CREATE ARTICLE
-      { path: "/publicar/texto", element: <CreateArticle document={false} /> },
-      { path: "/publicar/documento", element: <CreateArticle document={true} /> },
+        { path: "/create/article", element: <CreateArticle document={false} /> },
+        { path: "/create/document", element: <CreateArticle document={true} /> },
 
-      //ARTICLE INFO
-      { path: "/detalles/:id", element: <Commentbox /> },
+        { path: "/post/:id", element: <Commentbox /> },
 
-      //NOTIFICATIONS
-      { path: "/notificaciones", element: <Notifications /> },
-      { path: "/notificaciones/publicaciones", element: <NotificationsArticles /> },
-      // { path: "/notificaciones/eventos", element: <NotificationsEvents /> },
-      { path: "/notificaciones/comentarios", element: <NotificationsArticles /> },
+        { path: "/notifications", element: <Notifications /> },
+        { path: "/notifications/post", element: <NotificationsArticles /> },
 
-      //SETTINGS
-      { path: "/ajustes", element: <Settings /> },
-      { path: "/ajustes/sistema", element: <SettingsSystem /> },
-      { path: "/ajustes/cuenta", element: <SettingsAccount /> },
-      { path: "/ajustes/cuenta/contraseña", element: <ChangePassword /> },
-      { path: "/ajustes/cuenta/olvide-contraseña", element: <ForgotPassword /> },
-      { path: "/ajustes/cuenta/restablecer-contraseña", element: <ResetPassword /> },
+        { path: "/settings", element: <Settings /> },
+        { path: "/settings/sistema", element: <SettingsSystem /> },
+        { path: "/settings/cuenta", element: <SettingsAccount /> },
+        { path: "/settings/cuenta/contraseña", element: <ChangePassword /> },
+        { path: "/settings/cuenta/olvide-contraseña", element: <ForgotPassword /> },
+        { path: "/settings/cuenta/restablecer-contraseña", element: <ResetPassword /> },
 
-      //PROFILE
-      { path: "/perfil", element: <Profile /> },
-      { path: "/perfil/:categoria", element: <Profile /> },
-      { path: "/perfil/editar", element: <EditProfile /> },
-      { path: "/perfil/siguiendo", element: <FollowingList /> },
-      { path: "/perfil/seguidores", element: <FollowersList /> },
+        { path: "/user/:id", element: <Profile /> },
+        { path: "/user/:id/:categoria", element: <Profile /> },
+        { path: "/user/edit", element: <EditProfile /> },
+        { path: "/user/following", element: <FollowingList /> },
+        { path: "//user/followers", element: <FollowersList /> },
+        { path: "/user/:id/following", element: <FollowingList /> },
+        { path: "/user/:id/followers", element: <FollowersList /> },
 
-      { path: "/otroperfil/:id", element: <OtherProfile /> },
+        { path: "/chat/crear", element: <CreateGroup /> },
+        { path: "/chat/grupo/:id", element: <GroupSettings /> },
 
-      //CHAT
-      // { path: "/chat", element: <Chat /> },
-      { path: "/chat/crear", element: <CreateGroup /> },
-      { path: "/chat/grupo/:id", element: <GroupSettings /> },
-
-      { path: "/invitar-usuario", element: <InviteUser /> },
+        { path: "/invitar-usuario", element: <InviteUser /> },
+      ]},
     ],
   },
 
-  //INDEX
   { path: "*", element: <NotFound /> },
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
