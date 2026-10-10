@@ -362,7 +362,7 @@ export const login = async (req, res) => {
 };
 
 export const logout = (_req, res) => {
-  res.clearCookie("token", COOKIE_OPTIONS);
+  res.clearCookie("token", { httpOnly: true, sameSite: "lax", secure: false });
   return res.json({ message: "Sesión cerrada" });
 };
 

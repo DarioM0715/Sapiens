@@ -79,6 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null);
     } catch (error) {
       console.error("Error al logout", error);
+      setUser(null);
     }
   };
 
