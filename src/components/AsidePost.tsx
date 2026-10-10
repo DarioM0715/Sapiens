@@ -68,11 +68,11 @@ export const AsidePost = () => {
               const { id, name, username, isFollowing } = user;
 
               return (
-                <div key={id} className="flex items-center justify-between w-full">
-                  <NavLink to={`/user/${id}`}>
-                    <div className="flex items-center gap-3">
+                <div key={id} className="flex items-center justify-between gap-3 w-full">
+                  <NavLink to={`/user/${id}`} className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0">
                       <Avatar user={user} size={12} />
-                      <div className="truncate">
+                      <div className="min-w-0">
                         <h3 className="font-semibold text-primary truncate">{name}</h3>
                         <p className="text-sm text-muted truncate">{username}</p>
                       </div>
@@ -84,7 +84,7 @@ export const AsidePost = () => {
                     onClick={() => (isFollowing ? unfollowMutation.mutate(id) : followMutation.mutate(id))}
                     disabled={isFollowPending}
                     aria-label={isFollowing ? `Dejar de seguir a ${name}` : `Seguir a ${name}`}
-                    className="p-2 border border-[var(--color-border)] rounded-xl transition flex items-center justify-center hover:cursor-pointer bg-surface hover-surface-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex-shrink-0 p-2 border border-[var(--color-border)] rounded-xl transition flex items-center justify-center hover:cursor-pointer bg-surface hover-surface-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     title={isFollowing ? `Dejar de seguir a ${name}` : `Seguir a ${name}`}
                   >
                     {isFollowing ? <Check size={18} className="text-primary" /> : <Plus size={18} className="text-primary" />}

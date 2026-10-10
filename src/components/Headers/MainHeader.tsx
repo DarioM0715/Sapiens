@@ -23,7 +23,7 @@ export const Bubble = ({ number }: { number: number }) => {
 }
 
 export const MainHeader = () => {
-  const { user, isLoadingAuth } = useAuthContext();
+  const { user, isLoadingAuth, logout } = useAuthContext();
   const id = user?.id ?? "";
 
   const [openPanel, setOpenPanel] = useState<string | null>(null);
@@ -66,9 +66,9 @@ export const MainHeader = () => {
   const buttonsNotifications = [{ name: "Notificaciones", path: "/notificaciones" }];
 
   const buttonsProfile = [
-    { name: "Ver perfil", path:`/user/${id}` },
+    { name: "Ver perfil", path: `/user/${id}` },
     { name: "Ajustes", path: "/settings" },
-    { name: "Cerrar sesión", path: "/login" },
+    { name: "Cerrar sesión", path: "/login", onClick: () => void logout() },
   ];
 
   return (
