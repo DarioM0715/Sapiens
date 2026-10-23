@@ -10,8 +10,8 @@ type NotificationNav = {
 
 export const Notifications = () => {
   const notificationsnavs: NotificationNav[] = [
-    { name: "Publicaciones", path: "/notificaciones/publicaciones", icon: Speaker },
-    { name: "Comentarios", path: "/notificaciones/comentarios", icon: UserCheck },
+    { name: "Publicaciones", path: "/notifications/post", icon: Speaker },
+    { name: "Comentarios", path: "/notifications", icon: UserCheck },
   ];
 
   return (
@@ -24,7 +24,7 @@ export const Notifications = () => {
                 Notificaciones
               </h2>
 
-              <Buttonav path="/settings/notificaciones" className="pr-2.5">
+              <Buttonav path="/settings" className="pr-2.5">
                 <Settings size={20} className="text-primary" />
               </Buttonav>
             </div>

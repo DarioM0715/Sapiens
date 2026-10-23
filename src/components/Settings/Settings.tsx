@@ -9,7 +9,7 @@ type SettingsNav = {
 
 const Settings = () => {
   const settingsnavs: SettingsNav[] = [
-    { name: "Notificaciones", path: "/notificaciones", icon: Bell },
+    { name: "Notificaciones", path: "/notifications", icon: Bell },
     { name: "Privacidad", path: "/settings/privacidad", icon: LockIcon },
     { name: "Sistema", path: "/settings/sistema", icon: LockIcon },
   ];
