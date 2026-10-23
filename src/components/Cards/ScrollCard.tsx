@@ -1,21 +1,39 @@
-import type { Post } from "@/types/types";
 import { PostCard } from "../Cards/PostCard";
 import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { NavLink } from "react-router-dom";
 import { AsidePost } from "../AsidePost";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import type { Path } from "@/types/components";
+import type { Post } from "@/types/post";
 
 interface Props {
   posts: Post[];
   navs: Path[];
+  isLoading?: boolean;
+  isEmpty?: boolean;
   chidren?: React.ReactNode;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  onLoadMore?: () => void;
 }
 
-export const ScrollCard = ({ posts, navs }: Props) => {
+export const ScrollCard = ({
+  posts,
+  navs,
+  isLoading = false,
+  isEmpty = false,
+  hasNextPage = false,
+  isFetchingNextPage = false,
+  onLoadMore,
+}: Props) => {
   const isDesktop = useIsDesktop(1024);
+  const sentinelRef = useInfiniteScroll(() => onLoadMore?.(), {
+    enabled: hasNextPage && !isLoading,
+    isLoading: isFetchingNextPage,
+  });
 
   return (
-    <div className="flex flex-col justify-center lg:flex-row gap-8 w-full py-5 px-5 lg:px-10 xl:px-20">
+    <div className="flex justify-center bg-surface lg:flex-row gap-8 w-full py-5 px-5 lg:px-10 xl:px-20">
       {/* MAIN COLUMN */}
       <section className="flex-1 flex flex-col rounded-2xl bg-surface-2 border-default">
         {isDesktop && (
@@ -39,10 +57,22 @@ export const ScrollCard = ({ posts, navs }: Props) => {
           </nav>
         )}
 
-        <div className="flex flex-col gap-4 bg-surface p-4 md:p-6 rounded-b-2xl overflow-hidden">
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+        <div className="flex flex-col gap-4 bg-surface rounded-b-2xl">
+          {isLoading && <p className="py-10 text-center text-muted">Cargando publicaciones...</p>}
+          {!isLoading && isEmpty && <p className="py-10 text-center text-muted">Aún no hay publicaciones.</p>}
+          {!isLoading && !isEmpty && posts.map((post) => (
+            <div key={post.id} className="border-b border-[var(--color-border)]">
+              <PostCard post={post} />
+            </div>
           ))}
+          {!isLoading && !isEmpty && hasNextPage && (
+            <div ref={sentinelRef} className="py-6 text-center text-muted text-sm" aria-live="polite">
+              {isFetchingNextPage ? "Cargando más publicaciones..." : "Desplaza para cargar más"}
+            </div>
+          )}
+          {!isLoading && !isEmpty && !hasNextPage && posts.length > 0 && (
+            <p className="py-6 text-center text-muted text-xs">No hay más publicaciones</p>
+          )}
         </div>
       </section>
 

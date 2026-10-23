@@ -1,0 +1,49 @@
+import { User } from "./users";
+
+export type Media = {
+  id: number;
+  name: string;
+  url: string;
+};
+
+export type Options = {
+  id: number;
+  name: string;
+  function: (...args: unknown[]) => unknown;
+};
+
+export type Like = {
+  id: number;
+  user: User;
+  post: Post;
+};
+
+export type Bibliography = {
+  id: number;
+  title: string;
+  description: string;
+  url: string;
+};
+
+export type Post = {
+  id: string | number;
+  parentId?: string | null;
+  title: string;
+  description: string;
+  content?: string;
+  time: string;
+  categories?: string[];
+  views: number;
+  messages: number;
+  likes: number;
+  dislikes?: number;
+  hasLiked?: boolean;
+  hasDisliked?: boolean;
+  hasSaved?: boolean;
+  media?: Media[];
+  user: User;
+  institution?: string;
+  type?: string;
+  documentUrl?: string;
+  bibliography?: Bibliography[];
+};

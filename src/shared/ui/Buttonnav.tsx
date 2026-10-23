@@ -10,7 +10,7 @@ export const Buttonav = ({ children, path, className }: ButtonProps) => {
   const navigate = useNavigate();
 
   return (
-    <button className={`cursor-pointer ${className}`} onClick={() => navigate(path)}>
+    <button className={`cursor-pointer ${className}`} type="button" onClick={() => navigate(path)}>
       {children}
     </button>
   );

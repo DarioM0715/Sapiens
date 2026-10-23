@@ -39,8 +39,11 @@ export const Chat = ({ contacts = [], selectedContactId, onSend }: Props) => {
         <div className="flex items-center justify-between p-2 border-b border-gray-200 bg-white">
           <div className="flex items-center gap-3">
             <Avatar
-              name={contacts.find((c) => c.id === selectedContactId)?.name ?? "Contacto"}
-              url={contacts.find((c) => c.id === selectedContactId)?.avatarUrl}
+              user={{
+                id: 0,
+                name: contacts.find((c) => c.id === selectedContactId)?.name ?? "Contacto",
+                avatar: contacts.find((c) => c.id === selectedContactId)?.avatarUrl,
+              }}
               size={10}
             />
             <div>

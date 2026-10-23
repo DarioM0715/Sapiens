@@ -28,6 +28,6 @@ coverage/
 # Misc
 *.log
 
-.agents
 NOTES.md
+.agents
 skills-lock.json

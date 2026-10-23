@@ -1,88 +1,102 @@
-//REACT
-import { useForm } from "react-hook-form";
+//HOOKS
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 //COMPONENTS
-import { ButtonAction } from "@/shared/ui/ButtonAction";
-import { Buttonav } from "@/shared/ui/Buttonnav";
+import { PersonalInformation } from "./PersonalInformation";
+import { VerifyEmail } from "./VerifyEmail";
+import { RegisterPassword } from "./RegisterPassword";
+import { TermsConditions } from "./TermsConditions";
 
-//ICONS
-import { BsGoogle } from "react-icons/bs";
-import { MdOutlinePerson } from "react-icons/md";
-import { MdLockOutline } from "react-icons/md";
-import { FaUserCircle } from "react-icons/fa";
+const STEPS = ["Datos personales", "Verifica tu email", "Configura tu contraseña", "Términos y condiciones"];
 
-//TYPES
-import type { REGISTER_FORM } from "@/types/formstypes";
+const Stepper = ({ current, onStepClick }: { current: number; onStepClick: (index: number) => void }) => {
+    return (
+        <ol className="flex w-full items-center gap-2">
+            {STEPS.map((label, index) => {
+                const done = index < current;
+                const active = index === current;
+                const canGoBack = index < current;
+                return (
+                    <li key={label} className="flex flex-1 flex-col items-center gap-1.5">
+                        <button
+                            type="button"
+                            onClick={() => onStepClick(index)}
+                            disabled={!canGoBack}
+                            aria-label={label}
+                            title={canGoBack ? `Volver a ${label}` : undefined}
+                            className={`flex h-9 w-9 items-center justify-center rounded-full border-2 text-sm font-bold transition
+                ${canGoBack ? "border-green-500 bg-green-500 text-white hover:opacity-80 cursor-pointer" : ""}
+                ${active ? "border-blue-500 text-blue-600 dark:text-blue-300" : ""}
+                ${!done && !active ? "border-gray-400 text-muted cursor-not-allowed" : ""}`}
+                        >
+                            {done ? "✓" : index + 1}
+                        </button>
+                        <span
+                            className={`hidden text-center text-[11px] leading-tight sm:block ${
+                                active ? "font-semibold text-primary" : "text-muted"
+                            }`}
+                        >
+                            {label}
+                        </span>
+                    </li>
+                );
+            })}
+        </ol>
+    );
+};
 
 const Register = () => {
-  const { handleSubmit, register } = useForm<REGISTER_FORM>({
-    defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      confirm_password: "",
-    },
-  });
+    const [searchParams] = useSearchParams();
+    const verifyParam = searchParams.get("verify") ?? "";
+    const [step, setStep] = useState<number>(0);
+    const [registeredEmail, setRegisteredEmail] = useState(verifyParam);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
-  const onSubmit = (data: REGISTER_FORM) => {
-    console.log("submit", data);
-  };
+    const goToStep = (index: number) => {
+        setError("");
+        setSuccess("");
+        setStep(index);
+    };
 
-  return (
-    <div className="flex flex-col gap-4 items-center justify-center w-full h-screen p-10 bg-surface">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col items-center justify-center gap-8 py-6 px-6 sm:px-8 rounded-4xl bg-surface-2 border-default shadow-md w-full max-w-md"
-      >
-        <FaUserCircle size={90} className="fill-blue-950" />
+    return (
+        <div className="auth-bg flex flex-col gap-6 items-center justify-center w-full min-h-screen p-6 bg-surface text-primary">
+            <div className="flex w-full max-w-6xl items-center justify-center">
+                <div className="auth-card">
+                    <div className="flex flex-col items-center justify-center gap-8 py-8 px-6 sm:px-10 w-full">
+                        <Stepper current={step} onStepClick={goToStep} />
 
-        <section className="flex flex-col gap-5 w-full">
-          <div className="flex items-center gap-3">
-            <MdOutlinePerson size={24} className="text-primary" />
-            <input {...register("username")} name="username" type="text" placeholder="Nombre de usuario" className="input-underline focus-ring-primary" />
-          </div>
+                        {step === 0 && (
+                            <PersonalInformation
+                                registeredEmail={registeredEmail}
+                                setRegisteredEmail={setRegisteredEmail}
+                                error={error}
+                                setError={setError}
+                                setSuccess={setSuccess}
+                                setStep={setStep}
+                            />
+                        )}
 
-          <div className="flex items-center gap-3">
-            <MdOutlinePerson size={24} className="text-primary" />
-            <input {...register("email")} name="email" type="email" placeholder="Email" className="input-underline focus-ring-primary" />
-          </div>
+                        {step === 1 && (
+                            <VerifyEmail
+                                registeredEmail={registeredEmail}
+                                error={error}
+                                setError={setError}
+                                success={success}
+                                setSuccess={setSuccess}
+                                setStep={setStep}
+                            />
+                        )}
 
-          <div className="flex items-center gap-3">
-            <MdLockOutline size={22} className="text-primary" />
-            <input {...register("password")} name="password" type="password" placeholder="Contraseña" className="input-underline focus-ring-primary" />
-          </div>
+                        {step === 2 && <RegisterPassword error={error} setError={setError} setSuccess={setSuccess} setStep={setStep} />}
 
-          <div className="flex items-center gap-3">
-            <MdLockOutline size={22} className="text-primary" />
-            <input
-              {...register("confirm_password")}
-              name="confirm_password"
-              type="password"
-              placeholder="Confirmar contraseña"
-              className="input-underline focus-ring-primary"
-            />
-          </div>
-        </section>
-
-        <div className="flex gap-16">
-          <Buttonav path="/login" className="text-sm text-primary hover:underline hover:text-primary-600 visited:text-primary cursor-pointer">
-            ¿Ya tienes cuenta?
-          </Buttonav>
+                        {step === 3 && <TermsConditions error={error} setError={setError} />}
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div className="w-full">
-          <ButtonAction type="submit" color="primary" className="w-full btn-primary" aria-label="Iniciar sesión">
-            Crear cuenta
-          </ButtonAction>
-        </div>
-      </form>
-
-      <ButtonAction type="button" color="primary" className="btn-primary flex items-center gap-5">
-        <BsGoogle size={24} />
-        Crear cuenta con Google
-      </ButtonAction>
-    </div>
-  );
+    );
 };
 
 export default Register;

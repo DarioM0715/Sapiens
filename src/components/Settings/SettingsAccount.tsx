@@ -3,8 +3,8 @@ import { ChevronRight } from "lucide-react";
 
 const SettingsAccount = () => {
   const listlink = [
-    { title: "Cambiar contraseña", link: "/ajustes/cuenta/contraseña" },
-    { title: "Eliminar cuenta", link: "/ajustes/cuenta/eliminar" },
+    { title: "Cambiar contraseña", link: "/settings/cuenta/contraseña" },
+    { title: "Eliminar cuenta", link: "/settings/cuenta/eliminar" },
   ];
 
   return (

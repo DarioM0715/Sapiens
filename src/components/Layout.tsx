@@ -3,22 +3,23 @@ import { useIsDesktop } from "@/shared/ui/useIsDesktop";
 import { MainHeader } from "./Headers/MainHeader";
 import { MobileHeader } from "./Headers/MobileHeader";
 import { ScrollToTop } from "./ScrollToTop";
+import { Footer } from "./Footers/Footer";
 
 const Layout = ({ sidebarBreakpoint = 1024 }) => {
   const isDesktop = useIsDesktop(sidebarBreakpoint);
 
   return (
-    <div className="bg-white text-textprimary">
+    // <div id="principalgrid" className="bg-surface grid min-h-dvw">
+    <div className="bg-surface flex min-h-dvh w-full flex-col">
       <ScrollToTop />
       {isDesktop ? <MainHeader /> : <MobileHeader />}
 
-      <main className="flex items-center justify-center ">
+      <main className="flex flex-1 items-start justify-center bg-surface">
         <Outlet />
       </main>
+      {!isDesktop && <Footer/>}
     </div>
   );
 };
 
 export default Layout;
-
-// py-5 px-5 lg:px-10 xl:px-20

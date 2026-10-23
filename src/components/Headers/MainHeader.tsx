@@ -12,15 +12,27 @@ import { Avatar } from "../Avatar";
 //SHAREDS
 import { Input } from "@/shared/inputs/Input";
 
+export const Bubble = ({ number }: { number: number }) => {
+  return (
+    <div className="bg-red-600 border-4 border-gray-900 absolute rounded-full px-2 bottom-4 left-5">
+      <span className="font-bold">
+        {number}
+      </span>
+    </div>
+  )
+}
+
 export const MainHeader = () => {
-  const { user } = useAuthContext();
+  const { user, isLoadingAuth, logout } = useAuthContext();
+  const id = user?.id ?? "";
+
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const rightActionsRef = useRef<HTMLDivElement | null>(null);
 
   const navsup = [
     { name: "Sapiens", path: "/" },
-    { name: "Inicio", path: "/inicio" },
-    { name: "Comunidades", path: "/comunidades" },
+    { name: "Inicio", path: "/home" },
+    // { name: "Comunidades", path: "/community" },
   ];
 
   const handleMouseEnter = (panel: string) => {
@@ -44,17 +56,19 @@ export const MainHeader = () => {
     };
   }, []);
 
+  if (isLoadingAuth || !user) return null;
+
   const buttonsPost = [
-    { name: "Mensaje", path: "/publicar/texto" },
-    { name: "Documento", path: "/publicar/documento" },
+    { name: "Texto", path: "/create/article" },
+    { name: "Documento", path: "/create/document" },
   ];
 
   const buttonsNotifications = [{ name: "Notificaciones", path: "/notificaciones" }];
 
   const buttonsProfile = [
-    { name: "Ver perfil", path: "/perfil" },
-    { name: "Ajustes", path: "/ajustes" },
-    { name: "Cerrar sesión", path: "/login" },
+    { name: "Ver perfil", path: `/user/${id}` },
+    { name: "Ajustes", path: "/settings" },
+    { name: "Cerrar sesión", path: "/login", onClick: () => void logout() },
   ];
 
   return (
@@ -85,10 +99,10 @@ export const MainHeader = () => {
           </div>
 
           {/* Right - Actions */}
-          <div className="flex items-center gap-4" ref={rightActionsRef}>
+          <div className="flex items-center gap-6" ref={rightActionsRef}>
             {/* Crear documento */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("post")}>
-              <button aria-label="Crear documento" aria-haspopup="true" type="button" className="p-2 rounded-md cursor-pointer hover:bg-surface-2 transition">
+              <button aria-label="Crear documento" aria-haspopup="true" type="button" className="p-3 cursor-pointer hover-surface-2 transition rounded-full">
                 <PencilLine size={20} className="text-primary" />
               </button>
               {openPanel === "post" && <PanelOptions title="Escritura" buttons={buttonsPost} />}
@@ -96,18 +110,19 @@ export const MainHeader = () => {
 
             {/* Notificaciones */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("notifications")}>
-              <button aria-label="Notificaciones" aria-haspopup="true" type="button" className="p-2 rounded-md cursor-pointer hover:bg-surface-2 transition">
+              <button aria-label="Notificaciones" aria-haspopup="true" type="button" className="p-3 cursor-pointer hover-surface-2 transition rounded-full">
                 <Bell size={20} className="text-primary" />
               </button>
               {openPanel === "notifications" && <PanelOptions title="Notificaciones" buttons={buttonsNotifications} />}
+              <Bubble number={5}/>
             </div>
 
-            {/* Perfil */}
+            {/* user */}
             <div className="relative inline-block" onMouseEnter={() => handleMouseEnter("profile")}>
-              <NavLink to="/perfil" className="block rounded-full focus:outline-none focus-ring-primary" aria-haspopup="true">
+              <NavLink to={`/user/${id}`} className="block rounded-full focus:outline-none focus-ring-primary" aria-haspopup="true">
                 <Avatar user={user} size={10} />
               </NavLink>
-              {openPanel === "profile" && <PanelOptions title="Perfil" buttons={buttonsProfile} />}
+              {openPanel === "profile" && <PanelOptions title="Usuario" buttons={buttonsProfile} />}
             </div>
           </div>
         </div>

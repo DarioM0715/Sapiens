@@ -2,7 +2,7 @@
 import { Avatar } from "../Avatar";
 
 //TYPES
-import type { Contact } from "@/types/types";
+import type { Contact } from "@/types/system";
 
 export const ContactItem: React.FC<{ contact: Contact; selected?: boolean; onClick?: () => void }> = ({ contact, selected, onClick }) => {
   const { user, read, last_message, last_time } = contact;

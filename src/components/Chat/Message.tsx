@@ -18,7 +18,7 @@ export const MessageBubble: React.FC<{ msg: Message }> = ({ msg }) => {
       <div className={`max-w-[70%] flex items-end gap-2 ${isMe ? "flex-row-reverse" : ""}`}>
         {!isMe && (
           <div className="flex-shrink-0">
-            <Avatar name={isMe ? "Yo" : "Contacto"} url={msg.avatarUrl} size={8} />
+            <Avatar user={{ id: 0, name: "Contacto", avatar: msg.avatarUrl }} size={8} />
           </div>
         )}
 
