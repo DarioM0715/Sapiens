@@ -11,7 +11,7 @@ const SettingsAccount = () => {
     <div className=" bg-primary   text-white">
       <div className="flex flex-col">
         {listlink.map((link, key) => (
-          <Buttonav path={link.link} key={key} className="flex items-center justify-between p-4">
+          <Buttonav link={link.link} key={key} className="flex items-center justify-between p-4">
             <p>{link.title}</p>
 
             <div className="flex items-center gap-2">

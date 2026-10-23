@@ -66,25 +66,19 @@ export const router = createBrowserRouter([
 
         { path: "/notifications", element: <Notifications /> },
         { path: "/notifications/post", element: <NotificationsArticles /> },
-        { path: "/notificaciones", element: <Navigate to="/notifications" replace /> },
-        { path: "/notificaciones/*", element: <Navigate to="/notifications" replace /> },
 
         { path: "/settings", element: <Settings /> },
-        { path: "/settings/notificaciones", element: <Settings /> },
-        { path: "/settings/privacidad", element: <Settings /> },
-        { path: "/settings/bloqueados", element: <Settings /> },
         { path: "/settings/sistema", element: <SettingsSystem /> },
         { path: "/settings/cuenta", element: <SettingsAccount /> },
         { path: "/settings/cuenta/contraseña", element: <ChangePassword /> },
         { path: "/settings/cuenta/olvide-contraseña", element: <ForgotPassword /> },
         { path: "/settings/cuenta/restablecer-contraseña", element: <ResetPassword /> },
-        { path: "/settings/cuenta/eliminar", element: <SettingsAccount /> },
 
         { path: "/user/:id", element: <Profile /> },
         { path: "/user/:id/:categoria", element: <Profile /> },
         { path: "/user/edit", element: <EditProfile /> },
         { path: "/user/following", element: <FollowingList /> },
-        { path: "/user/followers", element: <FollowersList /> },
+        { path: "//user/followers", element: <FollowersList /> },
         { path: "/user/:id/following", element: <FollowingList /> },
         { path: "/user/:id/followers", element: <FollowersList /> },
 
