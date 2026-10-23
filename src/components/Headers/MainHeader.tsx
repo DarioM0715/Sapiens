@@ -63,7 +63,7 @@ export const MainHeader = () => {
     { name: "Documento", path: "/create/document" },
   ];
 
-  const buttonsNotifications = [{ name: "Notificaciones", path: "/notifications" }];
+  const buttonsNotifications = [{ name: "Notificaciones", path: "/notificaciones" }];
 
   const buttonsProfile = [
     { name: "Ver perfil", path: `/user/${id}` },

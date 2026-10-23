@@ -28,7 +28,7 @@ export const UserCard = ({ user, number, finaluser }: { user: User, number: numb
     options.splice(1, 1);
   }
 
-  if (pathname !== "/user/followers") {
+  if (pathname !== "//user/followers") {
     options.splice(2, 1);
   }
 
