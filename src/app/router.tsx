@@ -74,11 +74,11 @@ export const router = createBrowserRouter([
         { path: "/settings/cuenta/olvide-contraseña", element: <ForgotPassword /> },
         { path: "/settings/cuenta/restablecer-contraseña", element: <ResetPassword /> },
 
-        { path: "/user/:id", element: <Profile /> },
-        { path: "/user/:id/:categoria", element: <Profile /> },
         { path: "/user/edit", element: <EditProfile /> },
         { path: "/user/following", element: <FollowingList /> },
-        { path: "//user/followers", element: <FollowersList /> },
+        { path: "/user/followers", element: <FollowersList /> },
+        { path: "/user/:id", element: <Profile /> },
+        { path: "/user/:id/:categoria", element: <Profile /> },
         { path: "/user/:id/following", element: <FollowingList /> },
         { path: "/user/:id/followers", element: <FollowersList /> },
 

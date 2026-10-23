@@ -14,7 +14,7 @@ const FollowList = ({users, isLoading, targetId, isOwn}: FollowListProps) => {
 
   const navs = [
     { name: "Siguiendo", path: targetId ? `/user/${targetId}/following` : "/user/following" },
-    { name: "Seguidores", path: targetId ? `/user/${targetId}/followers` : "//user/followers"},
+    { name: "Seguidores", path: targetId ? `/user/${targetId}/followers` : "/user/followers"},
   ];
 
   return (

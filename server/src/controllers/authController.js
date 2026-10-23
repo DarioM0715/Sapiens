@@ -4,7 +4,6 @@ import crypto from "crypto";
 import { PrismaClient } from "@prisma/client";
 import Post from "../models/Post.js";
 import { decodeUserCursor, paginate, parseLimit, prismaCursorWhere } from "../utils/pagination.js";
-import { resetRateLimit } from "../middleware/rateLimit.js";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -48,39 +47,9 @@ export const publicUser = (user) => ({
   role: user.role ?? { id: 0, name: "alumno" },
 });
 
-const SIGNUP_COOKIE = "signup_draft";
-
 const setAuthCookie = (res, user) => {
   const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "7d" });
   res.cookie("token", token, COOKIE_OPTIONS);
-};
-
-const setSignupCookie = (res, data) => {
-  const token = jwt.sign(data, JWT_SECRET, { expiresIn: "1h" });
-  res.cookie(SIGNUP_COOKIE, token, COOKIE_OPTIONS);
-};
-
-const getSignupDraft = (req) => {
-  const token = req.cookies?.[SIGNUP_COOKIE];
-  if (!token) return null;
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch {
-    return null;
-  }
-};
-
-const requireSignupDraft = (req, res, { verified = false } = {}) => {
-  const draft = getSignupDraft(req);
-  if (!draft) {
-    res.status(400).json({ message: "No hay un registro en proceso" });
-    return null;
-  }
-  if (verified && !draft.emailVerified) {
-    res.status(400).json({ message: "Debes verificar tu email primero" });
-    return null;
-  }
-  return draft;
 };
 
 const codeMatches = (submitted = "", expected = "") => {
@@ -183,8 +152,6 @@ export const signup = async (req, res) => {
       code,
       emailVerified: false,
     });
-
-    resetRateLimit("signup", req);
 
     return res.status(201).json({
       message: delivery.devCode
@@ -387,7 +354,6 @@ export const login = async (req, res) => {
 
     const safe = publicUser(user);
     setAuthCookie(res, safe);
-    resetRateLimit("login", req);
     return res.json({ user: safe });
   } catch (error) {
     console.error("Error en login:", error);
