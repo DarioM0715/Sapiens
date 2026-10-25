@@ -86,9 +86,11 @@ export const PostCard = ({ post, className }: { post: Post, className?: string }
 
       {/* BODY (clicable) */}
       <div onClick={() => handleNavigate(`/post/${id}`)} role="button" className="flex flex-col gap-2 text-primary cursor-pointer">
-        <h3 className="font-bold text-lg flex items-center gap-2" id={`post-title-click-${id}`}>
-          {title}
-        </h3>
+        {title && (
+          <h3 className="font-bold text-lg flex items-center gap-2" id={`post-title-click-${id}`}>
+            {title}
+          </h3>
+        )}
         <p className="text-sm text-muted">{description}</p>
       </div>
 
