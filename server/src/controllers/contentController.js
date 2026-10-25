@@ -270,12 +270,16 @@ export const createPost = async (req, res) => {
   try {
     const { title = "", description = "", content = "", type = "", institution = "", documentUrl = "", parentId = null } = req.body;
 
-    if (!description && !content) {
+    const messageText = (content || description).trim();
+    if (!messageText) {
       return res.status(400).json({ message: "El contenido de la publicación es obligatorio" });
     }
-    if (!parentId && !title) {
+
+    const isDocumentOrArticle = type === "Documento" || type === "Artículo";
+    if (!parentId && isDocumentOrArticle && !title.trim()) {
       return res.status(400).json({ message: "El título es obligatorio" });
     }
+
     if (parentId && !mongoose.isValidObjectId(parentId)) {
       return res.status(400).json({ message: "ID inválido" });
     }
@@ -288,10 +292,10 @@ export const createPost = async (req, res) => {
 
     const post = await Post.create({
       parentId: parentId || null,
-      title: parentId ? "" : title,
-      description: description || content,
-      content,
-      type,
+      title: parentId ? "" : title.trim(),
+      description: description.trim() || messageText,
+      content: content.trim() || messageText,
+      type: type.trim() || "Mensaje",
       institution,
       documentUrl,
       categories: parentId ? [] : parseCategories(req.body.categories),
