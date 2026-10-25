@@ -77,6 +77,37 @@ const getRequestUserId = (req) => {
   }
 };
 
+export const getViewerIdentifier = (req) => {
+  const userId = getRequestUserId(req);
+  if (userId) {
+    return `user:${userId}`;
+  }
+  const rawIp = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.ip || req.socket?.remoteAddress || "127.0.0.1";
+  return `guest:${rawIp}`;
+};
+
+export const registerPostView = async (postId, viewerId) => {
+  if (!viewerId) return null;
+
+  // Usa $addToSet para evitar duplicados en viewedBy.
+  // Si viewerId no está presente en viewedBy, se añade y se incrementa views en 1.
+  const updated = await Post.findOneAndUpdate(
+    { _id: postId, viewedBy: { $ne: viewerId } },
+    {
+      $addToSet: { viewedBy: viewerId },
+      $inc: { views: 1 },
+    },
+    { new: true }
+  ).lean();
+
+  if (updated) {
+    return updated;
+  }
+
+  // Si ya existía el espectador, simplemente obtenemos el documento actual
+  return Post.findById(postId).lean();
+};
+
 const parseCategories = (value) => {
   if (Array.isArray(value)) return value.map((c) => String(c).trim()).filter(Boolean);
   if (typeof value === "string") return value.split(",").map((c) => c.trim()).filter(Boolean);
@@ -140,7 +171,8 @@ export const getPost = async (req, res) => {
     const { id } = req.params;
     if (!isValidId(id, res)) return;
 
-    const post = await Post.findByIdAndUpdate(id, { $inc: { views: 1 } }, { new: true }).lean();
+    const viewerId = getViewerIdentifier(req);
+    const post = await registerPostView(id, viewerId);
     if (!post) {
       return res.status(404).json({ message: "Publicación no encontrada" });
     }
@@ -150,6 +182,26 @@ export const getPost = async (req, res) => {
     return res.json({ post: serializePost(post, count, currentUserId) });
   } catch (error) {
     console.error("Error al obtener post:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+
+export const recordView = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!isValidId(id, res)) return;
+
+    const viewerId = getViewerIdentifier(req);
+    const post = await registerPostView(id, viewerId);
+    if (!post) {
+      return res.status(404).json({ message: "Publicación no encontrada" });
+    }
+
+    const count = await countReplies(post._id);
+    const currentUserId = getRequestUserId(req);
+    return res.json({ post: serializePost(post, count, currentUserId), views: post.views ?? 0 });
+  } catch (error) {
+    console.error("Error al registrar vista:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 };

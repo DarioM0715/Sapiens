@@ -15,6 +15,7 @@ const postSchema = new mongoose.Schema(
     likedBy: { type: [String], default: [] },
     dislikedBy: { type: [String], default: [] },
     savedBy: { type: [String], default: [] },
+    viewedBy: { type: [String], default: [] },
     media: { type: [{ name: String, url: String }], default: [] },
     user: {
       userId: { type: String, index: true },

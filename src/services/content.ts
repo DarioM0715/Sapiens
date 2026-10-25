@@ -55,6 +55,11 @@ export const fetchPost = async (id: string | number): Promise<Post> => {
   return data.post;
 };
 
+export const recordPostView = async (id: string | number): Promise<Post> => {
+  const { data } = await apiServer.post<{ post: Post }>(`/posts/${id}/view`);
+  return data.post;
+};
+
 export const createPost = async (payload: CreatePostPayload): Promise<Post> => {
   const { data } = await apiServer.post<{ post: Post }>("/posts", payload);
   return data.post;

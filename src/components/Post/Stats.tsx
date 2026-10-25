@@ -33,8 +33,7 @@ export const InteractButton = ({ Icon, value, onClick, disabled, active, activeC
         fill={active ? "currentColor" : "none"}
         className={`transform transition-all duration-150 hover:scale-125 ${active ? activeClass : "text-muted hover:stroke-blue-400"}`}
       />
-      {value && <p className="text-sm">{value ?? 0}</p>}
-      {/* <p className="text-sm">{value ?? 0}</p> */}
+      {value !== undefined && <p className="text-sm">{value}</p>}
     </button>
   );
 };
@@ -52,7 +51,7 @@ export const Stats = ({ post }: Props) => {
   return (
     <div className="flex justify-between items-center pt-2">
       <div className="flex items-center gap-6 text-muted">
-        <InteractButton Icon={Eye} value={views} />
+        <InteractButton Icon={Eye} value={views} onClick={() => navigate(`/post/${id}`)} />
         <InteractButton Icon={MessageCircle} value={messages} onClick={() => navigate(`/post/${id}`)} />
       </div>
 

@@ -426,10 +426,9 @@ export const getUsersId = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    const [followersCount, followingCount, postsCount] = await Promise.all([
+    const [followersCount, followingCount] = await Promise.all([
       prisma.follow.count({ where: { followingId: user.id } }),
       prisma.follow.count({ where: { followerId: user.id } }),
-      Post.countDocuments({ "user.userId": user.id, parentId: null }),
     ]);
 
     let isFollowing = false;
@@ -449,7 +448,7 @@ export const getUsersId = async (req, res) => {
       }
     }
 
-    return res.json({ user: { ...publicUser(user), postsCount, followersCount, followingCount, isFollowing } });
+    return res.json({ user: { ...publicUser(user), followersCount, followingCount, isFollowing } });
   } catch (error) {
     console.error("Error al buscar usuario:", error);
     return res.status(500).json({ message: "Error interno del servidor" });

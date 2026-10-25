@@ -6,6 +6,7 @@ import {
   fetchSavedPosts,
   fetchLikedPosts,
   fetchPost,
+  recordPostView,
   createPost,
   likePost,
   dislikePost,
@@ -55,10 +56,26 @@ export const useLikedPosts = (userId?: string | number) =>
   usePostList(["posts", "liked", userId ?? null], (params) => fetchLikedPosts(userId, params));
 
 export const usePost = (id?: string | number) => {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ["post", id],
-    queryFn: () => fetchPost(id as string | number),
+    queryFn: async () => {
+      const post = await fetchPost(id as string | number);
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      return post;
+    },
     enabled: !!id,
+  });
+};
+
+export const useRecordView = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string | number) => recordPostView(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post", id] });
+    },
   });
 };
 
