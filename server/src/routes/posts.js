@@ -11,6 +11,7 @@ import {
   toggleSavePost,
   listReplies,
   createReply,
+  recordView,
   requireAuth,
 } from "../controllers/contentController.js";
 
@@ -22,6 +23,7 @@ router.get("/saved", requireAuth, listSavedPosts);
 router.get("/liked", listLikedPosts);
 router.post("/", requireAuth, createPost);
 router.get("/:id", getPost);
+router.post("/:id/view", recordView);
 router.post("/:id/like", requireAuth, likePost);
 router.post("/:id/dislike", requireAuth, dislikePost);
 router.post("/:id/save", requireAuth, toggleSavePost);
