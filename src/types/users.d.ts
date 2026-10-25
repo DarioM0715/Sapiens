@@ -19,6 +19,7 @@ export type User = {
   emailVerified?: boolean;
   role?: Role;
   options?: Options;
+  postsCount?: number;
   followersCount?: number;
   followingCount?: number;
   isFollowing?: boolean;

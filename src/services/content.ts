@@ -4,7 +4,7 @@ import type { CursorParams, PostsPage } from "@/types/pagination";
 
 export type CreatePostPayload = {
   title?: string;
-  description?: string;
+  description: string;
   content?: string;
   type?: string;
   institution?: string;

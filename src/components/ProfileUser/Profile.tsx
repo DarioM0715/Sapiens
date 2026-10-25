@@ -79,7 +79,7 @@ export const Profile = ({ user, isOwn }: ProfileProps) => {
     {
       path: `/user/${user.id}`,
       title: "Publicaciones",
-      number: postsQuery.hasNextPage ? "+" : posts.length,
+      number: user.postsCount ?? (postsQuery.hasNextPage ? "+" : posts.length),
     },
     { path: `/user/${user.id}/following`, title: "Siguiendo", number: user.followingCount ?? 0 },
     { path: `/user/${user.id}/followers`, title: "Seguidores", number: user.followersCount ?? 0 },
